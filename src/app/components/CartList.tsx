@@ -1,31 +1,39 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-'use client';
-import React, { useEffect, useState } from 'react';
-import { Button, ButtonGroup, Col, Container, Input, Row, Table } from 'reactstrap';
-import styles from './cart.module.css';
-import Image from 'next/image';
-import DeleteIcon from '@mui/icons-material/Delete';
+"use client"
+import React, { useEffect, useState } from "react"
+import {
+  Button,
+  ButtonGroup,
+  Col,
+  Container,
+  Input,
+  Row,
+  Table,
+} from "reactstrap"
+import styles from "./cart.module.css"
+import Image from "next/image"
+import DeleteIcon from "@mui/icons-material/Delete"
 
 const FavoriteProducts = () => {
-  const [cartData, setCartData] = useState<any>([]);
+  const [cartData, setCartData] = useState<any>([])
   useEffect(() => {
     setCartData([
       {
-        image: '/cloth_1.jpg',
-        product: 'Top Up T-Shirt',
+        image: "/cloth_1.jpg",
+        product: "Top Up T-Shirt",
         price: 49,
         quantity: 1,
-        total: 49
+        total: 49,
       },
       {
-        image: '/cloth_2.jpg',
-        product: 'Polo Shirt',
+        image: "/cloth_2.jpg",
+        product: "Polo Shirt",
         price: 49,
         quantity: 1,
-        total: 49
-      }
-    ]);
-  }, []);
+        total: 49,
+      },
+    ])
+  }, [])
 
   return (
     <Container fluid="sm">
@@ -52,7 +60,8 @@ const FavoriteProducts = () => {
                         src={obj.image}
                         width={200}
                         height={150}
-                        style={{ objectFit: 'contain', backgroundColor: '#F9F9F9' }}
+                        style={{ objectFit: "contain" }}
+                        className={styles.bgColor}
                       />
                     </td>
                     <td>{obj.product}</td>
@@ -60,7 +69,11 @@ const FavoriteProducts = () => {
                     <td>
                       <ButtonGroup>
                         <Button color="danger">-</Button>
-                        <Input type="text" value={obj.quantity} className={styles.cartInput} />
+                        <Input
+                          type="text"
+                          value={obj.quantity}
+                          className={styles.cartInput}
+                        />
                         <Button color="danger">+</Button>
                       </ButtonGroup>
                     </td>
@@ -71,7 +84,7 @@ const FavoriteProducts = () => {
                       </Button>
                     </td>
                   </tr>
-                );
+                )
               })}
             </tbody>
           </Table>
@@ -80,7 +93,9 @@ const FavoriteProducts = () => {
       <Row xs="1" className="mb-3">
         <Col>
           {cartData.length === 0 && (
-            <div className={`d-flex flex-wrap gap-5 justify-content-around ${styles.favoriteSection}`}>
+            <div
+              className={`d-flex flex-wrap gap-5 justify-content-around ${styles.favoriteSection}`}
+            >
               <p>You don&apos;t have any products in the cart.</p>
             </div>
           )}
@@ -98,15 +113,21 @@ const FavoriteProducts = () => {
       </Row>
       <Row xs="1" sm="2" className="mb-3">
         <Col className="d-flex flex-column" xs="12" sm="8" md="9">
-          <h4 className='py-3'>Coupon</h4>
+          <h4 className="py-3">Coupon</h4>
           <p>Enter your coupon code if you have one.</p>
           <div className="d-flex gap-3">
-            <Input type="text" placeholder="Coupon Code" className={styles.couponInput} />
+            <Input
+              type="text"
+              placeholder="Coupon Code"
+              className={styles.couponInput}
+            />
             <Button color="danger">Apple Coupon</Button>
           </div>
         </Col>
         <Col className="" xs="12" sm="4" md="3">
-          <h4 className="text-uppercase border-bottom text-end py-3">Cart Totals</h4>
+          <h4 className="text-uppercase border-bottom text-end py-3">
+            Cart Totals
+          </h4>
           <div className="d-flex justify-content-between py-3">
             <p>Subtotal</p>
             <p>$230</p>
@@ -121,7 +142,7 @@ const FavoriteProducts = () => {
         </Col>
       </Row>
     </Container>
-  );
-};
+  )
+}
 
-export default FavoriteProducts;
+export default FavoriteProducts

@@ -1,23 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-'use client';
-import React from 'react';
-import { Card, CardBody, CardTitle, CardSubtitle, Button } from 'reactstrap';
-import Image from 'next/image';
+"use client"
+import React from "react"
+import { Card, CardBody, CardTitle, CardSubtitle, Button } from "reactstrap"
+import Image from "next/image"
+import styles from "./product.module.css"
 
 const ProductCard = ({ index, product, screen }: any) => {
   return (
     <Card
       key={index}
       style={{
-        width: screen === 'shop' ? '24rem' : '18rem'
+        width: screen === "shop" ? "24rem" : "18rem",
       }}
     >
       <Image
         alt="Sample"
         src={product.image}
-        width={screen === 'shop' ? 382 : 287}
+        width={screen === "shop" ? 382 : 287}
         height={150}
-        style={{ objectFit: 'contain', backgroundColor: '#F9F9F9' }}
+        style={{ objectFit: "contain" }}
+        className={styles.bgColor}
       />
       <CardBody>
         <CardTitle tag="h5">{product.title}</CardTitle>
@@ -35,7 +37,7 @@ const ProductCard = ({ index, product, screen }: any) => {
         </div>
       </CardBody>
     </Card>
-  );
-};
+  )
+}
 
-export default ProductCard;
+export default ProductCard
