@@ -20,11 +20,17 @@ import {
 import { useRouter } from "next/navigation"
 import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"
+import { useDispatch, useSelector } from "react-redux"
+import { RootState } from "../../store"
+import { logout } from "../../store/slices/authSlice"
 
 function Header(args: any) {
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated
+  )
+  const dispatch = useDispatch()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   const toggle = () => setIsOpen(!isOpen)
 
@@ -68,7 +74,7 @@ function Header(args: any) {
                     <DropdownItem divider />
                     <DropdownItem
                       onClick={() => {
-                        setIsAuthenticated(false)
+                        dispatch(logout())
                       }}
                     >
                       Logout

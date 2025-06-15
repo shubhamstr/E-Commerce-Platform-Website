@@ -1,15 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-'use client';
-import React, { useState } from 'react';
-import { Form, FormGroup, Label, Input, Col, Container, Row, Button } from 'reactstrap';
+"use client"
+import React, { useState } from "react"
+import {
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  Col,
+  Container,
+  Row,
+  Button,
+} from "reactstrap"
+import { useDispatch } from "react-redux"
+// import { RootState } from "../../store"
+import { login } from "../../store/slices/authSlice"
 
 const AuthForm = ({ type }: any) => {
+  // const isAuthenticated = useSelector(
+  //   (state: RootState) => state.auth.isAuthenticated
+  // )
+  const dispatch = useDispatch()
   const [userDetails, setUserDetails] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: ''
-  });
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  })
   return (
     <Container fluid="sm">
       <Row xs="1">
@@ -17,10 +33,10 @@ const AuthForm = ({ type }: any) => {
           xs="12"
           sm={{
             offset: 4,
-            size: 4
+            size: 4,
           }}
         >
-          {type === 'register' && (
+          {type === "register" && (
             <Form>
               <FormGroup>
                 <Label for="firstName">First Name</Label>
@@ -33,8 +49,8 @@ const AuthForm = ({ type }: any) => {
                   onChange={(e) => {
                     setUserDetails((prev) => ({
                       ...prev,
-                      [e.target.name]: e.target.value
-                    }));
+                      [e.target.name]: e.target.value,
+                    }))
                   }}
                 />
               </FormGroup>
@@ -49,8 +65,8 @@ const AuthForm = ({ type }: any) => {
                   onChange={(e) => {
                     setUserDetails((prev) => ({
                       ...prev,
-                      [e.target.name]: e.target.value
-                    }));
+                      [e.target.name]: e.target.value,
+                    }))
                   }}
                 />
               </FormGroup>
@@ -65,8 +81,8 @@ const AuthForm = ({ type }: any) => {
                   onChange={(e) => {
                     setUserDetails((prev) => ({
                       ...prev,
-                      [e.target.name]: e.target.value
-                    }));
+                      [e.target.name]: e.target.value,
+                    }))
                   }}
                 />
               </FormGroup>
@@ -81,8 +97,8 @@ const AuthForm = ({ type }: any) => {
                   onChange={(e) => {
                     setUserDetails((prev) => ({
                       ...prev,
-                      [e.target.name]: e.target.value
-                    }));
+                      [e.target.name]: e.target.value,
+                    }))
                   }}
                 />
               </FormGroup>
@@ -91,7 +107,7 @@ const AuthForm = ({ type }: any) => {
               </FormGroup>
             </Form>
           )}
-          {type === 'login' && (
+          {type === "login" && (
             <Form>
               <FormGroup>
                 <Label for="email">Email</Label>
@@ -104,8 +120,8 @@ const AuthForm = ({ type }: any) => {
                   onChange={(e) => {
                     setUserDetails((prev) => ({
                       ...prev,
-                      [e.target.name]: e.target.value
-                    }));
+                      [e.target.name]: e.target.value,
+                    }))
                   }}
                 />
               </FormGroup>
@@ -120,20 +136,27 @@ const AuthForm = ({ type }: any) => {
                   onChange={(e) => {
                     setUserDetails((prev) => ({
                       ...prev,
-                      [e.target.name]: e.target.value
-                    }));
+                      [e.target.name]: e.target.value,
+                    }))
                   }}
                 />
               </FormGroup>
               <FormGroup className="text-center">
-                <Button color="primary">Login</Button>
+                <Button
+                  color="primary"
+                  onClick={() => {
+                    dispatch(login())
+                  }}
+                >
+                  Login
+                </Button>
               </FormGroup>
             </Form>
           )}
         </Col>
       </Row>
     </Container>
-  );
-};
+  )
+}
 
-export default AuthForm;
+export default AuthForm
