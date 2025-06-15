@@ -41,25 +41,62 @@ function Header(args: any) {
           fluid="sm"
           className="d-flex justify-content-between align-ietms-center flex-wrap"
         >
-          <NavbarBrand href="/" className="text-uppercase">
+          <NavbarBrand
+            href="/"
+            className="text-uppercase"
+            onClick={(e) => {
+              e.preventDefault()
+              router.push("/")
+            }}
+          >
             Guest Market
           </NavbarBrand>
           <NavbarToggler onClick={toggle} />
           <Collapse isOpen={isOpen} navbar>
             <Nav className="me-auto" navbar>
               <NavItem>
-                <NavLink href="/shop/">Shop</NavLink>
+                <NavLink
+                  href="/shop/"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    router.push("/shop")
+                  }}
+                >
+                  Shop
+                </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="/wishlist/">Wishlist</NavLink>
+                <NavLink
+                  href="/wishlist/"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    router.push("/wishlist")
+                  }}
+                >
+                  Wishlist
+                </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="/contact/">Contact</NavLink>
+                <NavLink
+                  href="/contact/"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    router.push("/contact")
+                  }}
+                >
+                  Contact
+                </NavLink>
               </NavItem>
             </Nav>
             <Nav className="d-flex gap-2" navbar>
               <NavItem>
-                <NavLink href="/cart/">
+                <NavLink
+                  href="/cart/"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    router.push("/cart")
+                  }}
+                >
                   <ShoppingCartIcon /> Cart
                 </NavLink>
               </NavItem>

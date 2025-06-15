@@ -1,10 +1,12 @@
-'use client';
-import React from 'react';
-import { Button, Col, Container, Row } from 'reactstrap';
+"use client"
+import React from "react"
+import { Button, Col, Container, Row } from "reactstrap"
 // import Image from 'next/image';
-import styles from './collection.module.css';
+import { useRouter } from "next/navigation"
+import styles from "./collection.module.css"
 
 const Collections = () => {
+  const router = useRouter()
   return (
     <Container fluid="sm">
       <Row xs="1" className="py-5">
@@ -19,8 +21,9 @@ const Collections = () => {
           <div className={styles.collectionLeft}>
             {/* <Image src="/model_3.png" alt="model" fill={true} style={{ objectFit: 'cover' }} /> */}
             <Button
-              onClick={() => {
-                // setIsAuthenticated(true);
+              onClick={(e) => {
+                e.preventDefault()
+                router.push("/shop")
               }}
               className={`position-absolute top-50 start-50 ${styles.collectionBtn}`}
             >
@@ -32,8 +35,9 @@ const Collections = () => {
           <div className={styles.collectionRight}>
             {/* <Image src="/model_3.png" alt="model" fill={true} style={{ objectFit: 'cover' }} /> */}
             <Button
-              onClick={() => {
-                // setIsAuthenticated(true);
+              onClick={(e) => {
+                e.preventDefault()
+                router.push("/shop")
               }}
               className={`position-absolute top-50 start-50 ${styles.collectionBtn}`}
             >
@@ -43,7 +47,7 @@ const Collections = () => {
         </Col>
       </Row>
     </Container>
-  );
-};
+  )
+}
 
-export default Collections;
+export default Collections

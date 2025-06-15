@@ -1,9 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-'use client';
-import React from 'react';
-import { Breadcrumb, BreadcrumbItem, Col, Container, NavLink, Row } from 'reactstrap';
+"use client"
+import React from "react"
+import { useRouter } from "next/navigation"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  Col,
+  Container,
+  NavLink,
+  Row,
+} from "reactstrap"
 
-const BreadcrumbCompo = ({ activeScreenName, previousScreenLink, previousScreenName }: any) => {
+const BreadcrumbCompo = ({
+  activeScreenName,
+  previousScreenLink,
+  previousScreenName,
+}: any) => {
+  const router = useRouter()
   return (
     <Container fluid="sm">
       <Row xs="1" className="py-3">
@@ -11,12 +24,26 @@ const BreadcrumbCompo = ({ activeScreenName, previousScreenLink, previousScreenN
           {previousScreenLink && previousScreenName ? (
             <Breadcrumb>
               <BreadcrumbItem>
-                <NavLink href="/" className="text-primary">
+                <NavLink
+                  href="/"
+                  className="text-primary"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    router.push("/")
+                  }}
+                >
                   Home
                 </NavLink>
               </BreadcrumbItem>
               <BreadcrumbItem>
-                <NavLink href={previousScreenLink} className="d-inline text-primary">
+                <NavLink
+                  href={previousScreenLink}
+                  className="d-inline text-primary"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    router.push(previousScreenLink)
+                  }}
+                >
                   {previousScreenName}
                 </NavLink>
               </BreadcrumbItem>
@@ -25,7 +52,14 @@ const BreadcrumbCompo = ({ activeScreenName, previousScreenLink, previousScreenN
           ) : (
             <Breadcrumb>
               <BreadcrumbItem>
-                <NavLink href="/" className="text-primary">
+                <NavLink
+                  href="/"
+                  className="text-primary"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    router.push("/")
+                  }}
+                >
                   Home
                 </NavLink>
               </BreadcrumbItem>
@@ -35,7 +69,7 @@ const BreadcrumbCompo = ({ activeScreenName, previousScreenLink, previousScreenN
         </Col>
       </Row>
     </Container>
-  );
-};
+  )
+}
 
-export default BreadcrumbCompo;
+export default BreadcrumbCompo
