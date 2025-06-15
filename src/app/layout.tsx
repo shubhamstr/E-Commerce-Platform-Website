@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <Header color="primary" dark={true} expand="md" container="fluid" fixed="top" />
+        <Header color="light" expand="md" container="fluid" fixed="top" />
         <div style={{ marginTop: '57px' }}>{children}</div>
         <Footer />
       </body>

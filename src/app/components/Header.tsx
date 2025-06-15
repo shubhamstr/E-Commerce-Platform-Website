@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-'use client';
-import React, { useState } from 'react';
+"use client"
+import React, { useState } from "react"
 import {
   Collapse,
   Navbar,
@@ -14,24 +14,27 @@ import {
   DropdownMenu,
   DropdownItem,
   Button,
-  Container
+  Container,
   // NavbarText
-} from 'reactstrap';
-import { useRouter } from 'next/navigation';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+} from "reactstrap"
+import { useRouter } from "next/navigation"
+import AccountCircleIcon from "@mui/icons-material/AccountCircle"
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"
 
 function Header(args: any) {
-  const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter()
+  const [isOpen, setIsOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
-  const toggle = () => setIsOpen(!isOpen);
+  const toggle = () => setIsOpen(!isOpen)
 
   return (
     <div>
       <Navbar {...args}>
-        <Container fluid="sm" className="d-flex justify-content-between align-ietms-center flex-wrap">
+        <Container
+          fluid="sm"
+          className="d-flex justify-content-between align-ietms-center flex-wrap"
+        >
           <NavbarBrand href="/" className="text-uppercase">
             Guest Market
           </NavbarBrand>
@@ -65,7 +68,7 @@ function Header(args: any) {
                     <DropdownItem divider />
                     <DropdownItem
                       onClick={() => {
-                        setIsAuthenticated(false);
+                        setIsAuthenticated(false)
                       }}
                     >
                       Logout
@@ -76,11 +79,10 @@ function Header(args: any) {
                 <>
                   <NavItem>
                     <Button
-                      className="text-white"
-                      color="info"
+                      color="primary"
                       outline
                       onClick={() => {
-                        router.push('/login');
+                        router.push("/login")
                       }}
                     >
                       Login
@@ -88,11 +90,10 @@ function Header(args: any) {
                   </NavItem>
                   <NavItem>
                     <Button
-                      className="text-white"
-                      color="info"
+                      color="primary"
                       outline
                       onClick={() => {
-                        router.push('/register');
+                        router.push("/register")
                       }}
                     >
                       Register
@@ -105,7 +106,7 @@ function Header(args: any) {
         </Container>
       </Navbar>
     </div>
-  );
+  )
 }
 
-export default Header;
+export default Header
