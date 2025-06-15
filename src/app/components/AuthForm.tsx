@@ -37,7 +37,7 @@ const AuthForm = ({ type }: any) => {
           }}
         >
           {type === "register" && (
-            <Form>
+            <Form className="p-5 border border-secondary shadow rounded mb-5">
               <FormGroup>
                 <Label for="firstName">First Name</Label>
                 <Input
@@ -108,7 +108,7 @@ const AuthForm = ({ type }: any) => {
             </Form>
           )}
           {type === "login" && (
-            <Form>
+            <Form className="p-5 border border-secondary shadow rounded mb-5">
               <FormGroup>
                 <Label for="email">Email</Label>
                 <Input
