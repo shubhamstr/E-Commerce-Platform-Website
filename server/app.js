@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 var express = require("express")
 var path = require("path")
 var cookieParser = require("cookie-parser")
