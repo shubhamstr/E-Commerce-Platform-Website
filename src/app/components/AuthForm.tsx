@@ -13,8 +13,8 @@ import {
 } from "reactstrap"
 import { useDispatch } from "react-redux"
 // import { RootState } from "../../store"
-import { login } from "../../store/slices/authSlice"
-import { registerUser } from "../../services/authService";
+import { login, setUserData } from "../../store/slices/authSlice"
+import { registerUser, loginUser } from "../../services/authService";
 import { showSuccess, showError } from '../../utils/toast';
 
 const AuthForm = ({ type }: any) => {
@@ -42,11 +42,33 @@ const AuthForm = ({ type }: any) => {
     if (type === "register") {
       const res = await registerUser(userDetails);
       const { success, message, data, error } = res.data
-      console.log(message);
       if (success) {
         showSuccess(message);
         console.log(data);
         resetForm();
+      } else {
+        showError(message);
+        console.error("Server error:", error);
+      }
+    } else if (type === "login") {
+      const res = await loginUser({
+        email: userDetails.email,
+        password: userDetails.password
+      });
+      const { success, message, data, error } = res.data
+      if (success) {
+        showSuccess(message);
+        console.log(data);
+        localStorage.setItem("ecomToken", data.token)
+        resetForm();
+        dispatch(login())
+        const { id, firstName, lastName, email } = data.userResp
+        dispatch(setUserData({
+          userId: id,
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+        }))
       } else {
         showError(message);
         console.error("Server error:", error);
@@ -185,8 +207,9 @@ const AuthForm = ({ type }: any) => {
               <FormGroup className="text-center">
                 <Button
                   color="primary"
-                  onClick={() => {
-                    dispatch(login())
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onSubmit();
                   }}
                 >
                   Login

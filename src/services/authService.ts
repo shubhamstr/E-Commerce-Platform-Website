@@ -6,3 +6,4 @@ import api from "../utils/api"
 // export const updateUser = (id: string, data: any) =>
 //   api.put(`/user/${id}`, data)
 export const registerUser = (data: any) => api.post("/user", data)
+export const loginUser = (data: any) => api.post("/user/login", data)
