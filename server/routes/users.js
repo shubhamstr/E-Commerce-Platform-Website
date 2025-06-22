@@ -92,7 +92,10 @@ router.post("/login", async function (req, res, next) {
 
     return sendResponse(res, {
       message: `Welcome ${userResp.firstName}!`,
-      data: token,
+      data: {
+        token,
+        userResp,
+      },
     })
   } catch (error) {
     console.error(error)
