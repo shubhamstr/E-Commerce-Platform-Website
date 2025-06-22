@@ -3,7 +3,6 @@
 var express = require("express")
 var router = express.Router()
 const sequelize = require("../utils/db")
-const User = require("../models/User")
 const sendResponse = require("../utils/response")
 
 /* GET home page. */
@@ -25,7 +24,6 @@ router.get("/", async function (req, res, next) {
       500
     )
   }
-  // res.render("index", { title: "Express" })
 })
 
 /* GET db operations. */
