@@ -4,25 +4,45 @@ var express = require("express")
 var router = express.Router()
 const User = require("../models/User")
 const sendResponse = require("../utils/response")
+const bcrypt = require("bcryptjs")
 
 /* POST user registering. */
 router.post("/", async function (req, res, next) {
   try {
     console.log(req.body)
     const { firstName, lastName, email, password } = req.body
+
+    // Check if user exists
+    const existingUser = await User.findOne({ where: { email: email } })
+    if (existingUser) {
+      return sendResponse(
+        res,
+        {
+          success: false,
+          message: "User already exists",
+        },
+        200
+      )
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10)
+
     const userResp = await User.create({
       firstName: firstName,
       lastName: lastName,
       email: email,
-      password: password,
+      password: hashedPassword,
     })
     console.log("User registered:", userResp.toJSON())
-    sendResponse(res, {
+
+    return sendResponse(res, {
       message: "User registered successfully.",
       data: userResp,
     })
   } catch (error) {
-    sendResponse(
+    console.error(error)
+    return sendResponse(
       res,
       {
         success: false,

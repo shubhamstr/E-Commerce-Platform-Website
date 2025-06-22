@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Form,
   FormGroup,
@@ -39,9 +39,10 @@ const AuthForm = ({ type }: any) => {
   }
 
   const onSubmit = async () => {
-    try {
+    if (type === "register") {
       const res = await registerUser(userDetails);
       const { success, message, data, error } = res.data
+      console.log(message);
       if (success) {
         showSuccess(message);
         console.log(data);
@@ -50,11 +51,14 @@ const AuthForm = ({ type }: any) => {
         showError(message);
         console.error("Server error:", error);
       }
-    } catch (error) {
-      console.error("Error creating user:", error);
-      showError("Internal Server Error");
     }
   }
+
+  useEffect(() => {
+    resetForm()
+  }, [])
+
+
   return (
     <Container fluid="sm">
       <Row xs="1">
