@@ -29,14 +29,30 @@ const AuthForm = ({ type }: any) => {
     password: "",
   })
 
+  const resetForm = () => {
+    setUserDetails({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+    })
+  }
+
   const onSubmit = async () => {
     try {
       const res = await registerUser(userDetails);
-      showSuccess("User created successfully!");
-      console.log(res.data);
+      const { success, message, data, error } = res.data
+      if (success) {
+        showSuccess(message);
+        console.log(data);
+        resetForm();
+      } else {
+        showError(message);
+        console.error("Server error:", error);
+      }
     } catch (error) {
       console.error("Error creating user:", error);
-      showError("Failed to create user.");
+      showError("Internal Server Error");
     }
   }
   return (
