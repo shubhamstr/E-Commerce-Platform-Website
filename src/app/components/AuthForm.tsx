@@ -14,6 +14,8 @@ import {
 import { useDispatch } from "react-redux"
 // import { RootState } from "../../store"
 import { login } from "../../store/slices/authSlice"
+import { registerUser } from "../../services/authService";
+import { showSuccess, showError } from '../../utils/toast';
 
 const AuthForm = ({ type }: any) => {
   // const isAuthenticated = useSelector(
@@ -26,6 +28,17 @@ const AuthForm = ({ type }: any) => {
     email: "",
     password: "",
   })
+
+  const onSubmit = async () => {
+    try {
+      const res = await registerUser(userDetails);
+      showSuccess("User created successfully!");
+      console.log(res.data);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      showError("Failed to create user.");
+    }
+  }
   return (
     <Container fluid="sm">
       <Row xs="1">
@@ -103,7 +116,15 @@ const AuthForm = ({ type }: any) => {
                 />
               </FormGroup>
               <FormGroup className="text-center">
-                <Button color="primary">Register</Button>
+                <Button
+                  color="primary"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onSubmit();
+                  }}
+                >
+                  Register
+                </Button>
               </FormGroup>
             </Form>
           )}
