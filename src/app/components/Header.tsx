@@ -22,7 +22,9 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"
 import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "../../store"
-import { logout } from "../../store/slices/authSlice"
+import { login, logout, setUserData } from "../../store/slices/authSlice"
+import { jwtDecode } from "jwt-decode";
+import { showError } from '../../utils/toast';
 
 function Header(args: any) {
   const isAuthenticated = useSelector(
@@ -33,6 +35,26 @@ function Header(args: any) {
   const [isOpen, setIsOpen] = useState(false)
 
   const toggle = () => setIsOpen(!isOpen)
+
+  if (localStorage.ecomToken) {
+    const token = localStorage.getItem("ecomToken");
+    console.log(token)
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        console.log("Decoded JWT:", decoded);
+        // showSuccess("Invalid JWT")
+        const { userId }: any = decoded
+        dispatch(login())
+        dispatch(setUserData(
+          { userId: userId }
+        ))
+      } catch (error) {
+        console.error("Invalid JWT:", error);
+        showError("Invalid JWT")
+      }
+    }
+  }
 
   return (
     <div>
