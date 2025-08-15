@@ -25,7 +25,7 @@ import { addAddress } from "../../services/authService";
 import { showSuccess, showError } from '../../utils/toast';
 import { useRouter } from "next/navigation"
 
-const AddressList = () => {
+const AddressList = ({ adId = null }) => {
   const router = useRouter()
   const userData = useSelector(
     (state: RootState) => state.auth.userData
@@ -55,6 +55,16 @@ const AddressList = () => {
       console.error("Server error:", error);
     }
   }
+
+  const getAddressDetails = async (id: any) => {
+
+  }
+
+  useEffect(() => {
+    if (adId) {
+      getAddressDetails(adId)
+    }
+  }, [adId])
 
   return (
     <Container fluid="sm" className="mb-5">
@@ -171,7 +181,7 @@ const AddressList = () => {
         <Row>
           <Col className="text-end">
             <Button color="danger" className="text-uppercase" onClick={onCreate}>
-              Add
+              {adId ? "Edit" : "Add"}
             </Button>
           </Col>
         </Row>

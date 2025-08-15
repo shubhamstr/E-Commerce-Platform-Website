@@ -121,7 +121,9 @@ const AddressList = () => {
                         Some quick example text to build on the card title and make up the bulk of the card&apos;s content.
                       </CardText>
                       <div className="d-flex">
-                        <Button color="danger" size="sm" className="text-uppercase me-2">
+                        <Button color="danger" size="sm" className="text-uppercase me-2" onClick={() => {
+                          router.push(`/addresses/${ad.id}`)
+                        }}>
                           Edit
                         </Button>
                         <Button color="danger" size="sm" className="text-uppercase me-2" onClick={() => {
