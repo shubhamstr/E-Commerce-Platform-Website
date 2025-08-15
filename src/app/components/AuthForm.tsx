@@ -16,8 +16,10 @@ import { useDispatch } from "react-redux"
 import { login, setUserData } from "../../store/slices/authSlice"
 import { registerUser, loginUser } from "../../services/authService";
 import { showSuccess, showError } from '../../utils/toast';
+import { useRouter } from "next/navigation"
 
 const AuthForm = ({ type }: any) => {
+  const router = useRouter()
   // const isAuthenticated = useSelector(
   //   (state: RootState) => state.auth.isAuthenticated
   // )
@@ -46,6 +48,7 @@ const AuthForm = ({ type }: any) => {
         showSuccess(message);
         console.log(data);
         resetForm();
+        router.push("/login")
       } else {
         showError(message);
         console.error("Server error:", error);
@@ -69,6 +72,7 @@ const AuthForm = ({ type }: any) => {
           lastName: lastName,
           email: email,
         }))
+        router.push("/account")
       } else {
         showError(message);
         console.error("Server error:", error);
