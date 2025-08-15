@@ -134,6 +134,10 @@ function Header(args: any) {
                       }}>Account</DropdownItem>
                     <DropdownItem
                       onClick={() => {
+                        router.push("/addresses")
+                      }}>Addresses</DropdownItem>
+                    <DropdownItem
+                      onClick={() => {
                         router.push("/change-password")
                       }}>Change Password</DropdownItem>
                     <DropdownItem divider />
