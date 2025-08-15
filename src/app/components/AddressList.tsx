@@ -74,6 +74,12 @@ const AddressList = () => {
     }
   }
 
+  function formatAddress(addressArr: any) {
+    return addressArr
+      .filter(Boolean) // removes null, undefined, and empty strings
+      .join(', ');
+  }
+
   useEffect(() => {
     fetchUserAddresses();
   }, [])
@@ -97,6 +103,13 @@ const AddressList = () => {
         <>
           <Row>
             {addressData.map((ad: any, adIndex: number) => {
+              const addr = formatAddress([
+                ad?.addressLine1,
+                ad?.addressLine2,
+                ad?.city,
+                ad?.state,
+                ad?.pinCode,
+              ]);
               return (
                 <Col key={adIndex} md="6" className="mb-3">
                   <Card
@@ -118,7 +131,7 @@ const AddressList = () => {
                         Card subtitle
                       </CardSubtitle> */}
                       <CardText>
-                        Some quick example text to build on the card title and make up the bulk of the card&apos;s content.
+                        {addr}
                       </CardText>
                       <div className="d-flex">
                         <Button color="danger" size="sm" className="text-uppercase me-2" onClick={() => {
