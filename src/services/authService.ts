@@ -9,3 +9,4 @@ export const updateUser = (id: any, data: any) => api.post(`/api/user/update/${i
 export const getUserAddresses = (id: any) => api.get(`/api/address/get/user/${id}`)
 export const addAddress = (data: any) => api.post("/api/address/add", data)
 export const deleteAddress = (id: any) => api.post(`/api/address/delete/${id}`)
+export const makeAddressDefault = (id: any, userId: any) => api.post(`/api/address/update/default/${id}/${userId}`)

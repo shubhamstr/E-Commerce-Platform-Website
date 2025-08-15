@@ -22,7 +22,7 @@ import {
 } from "reactstrap"
 import { useSelector } from "react-redux"
 import { RootState } from "../../store"
-import { getUserAddresses, deleteAddress } from "../../services/authService";
+import { getUserAddresses, deleteAddress, makeAddressDefault } from "../../services/authService";
 import { showSuccess, showError } from '../../utils/toast';
 import { useRouter } from "next/navigation"
 
@@ -50,6 +50,19 @@ const AddressList = () => {
 
   const onDelete = async (id: any) => {
     const res = await deleteAddress(id);
+    const { success, message, data, error } = res.data
+    if (success) {
+      showSuccess(message);
+      // console.log(data);
+      fetchUserAddresses()
+    } else {
+      showError(message);
+      console.error("Server error:", error);
+    }
+  }
+
+  const makeDefault = async (id: any) => {
+    const res = await makeAddressDefault(id, userData.userId);
     const { success, message, data, error } = res.data
     if (success) {
       showSuccess(message);
@@ -116,7 +129,9 @@ const AddressList = () => {
                         }}>
                           Delete
                         </Button>
-                        {!ad.isDefault && <Button color="danger" size="sm" className="text-uppercase me-2">
+                        {!ad.isDefault && <Button color="danger" size="sm" className="text-uppercase me-2" onClick={() => {
+                          makeDefault(ad.id)
+                        }}>
                           Make Default
                         </Button>}
                       </div>
