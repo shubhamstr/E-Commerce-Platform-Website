@@ -128,8 +128,14 @@ function Header(args: any) {
                     <AccountCircleIcon />
                   </DropdownToggle>
                   <DropdownMenu right>
-                    <DropdownItem>Option 1</DropdownItem>
-                    <DropdownItem>Option 2</DropdownItem>
+                    <DropdownItem
+                      onClick={() => {
+                        router.push("/account")
+                      }}>Account</DropdownItem>
+                    <DropdownItem
+                      onClick={() => {
+                        router.push("/change-password")
+                      }}>Change Password</DropdownItem>
                     <DropdownItem divider />
                     <DropdownItem
                       onClick={() => {
