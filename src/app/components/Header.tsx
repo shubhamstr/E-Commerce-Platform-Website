@@ -140,6 +140,8 @@ function Header(args: any) {
                     <DropdownItem
                       onClick={() => {
                         dispatch(logout())
+                        localStorage.removeItem("ecomToken")
+                        router.push("/")
                       }}
                     >
                       Logout

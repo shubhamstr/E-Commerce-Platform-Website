@@ -2,8 +2,7 @@
 // services/authService.ts
 import api from "../utils/api"
 
-// export const getUserProfile = () => api.get("/user/profile")
-// export const updateUser = (id: string, data: any) =>
-//   api.put(`/user/${id}`, data)
-export const registerUser = (data: any) => api.post("/user", data)
-export const loginUser = (data: any) => api.post("/user/login", data)
+export const registerUser = (data: any) => api.post("/api/user/register", data)
+export const loginUser = (data: any) => api.post("/api/user/login", data)
+export const getUser = (id: any) => api.get(`/api/user/get/${id}`)
+export const updateUser = (id: any, data: any) => api.post(`/api/user/update/${id}`, data)
