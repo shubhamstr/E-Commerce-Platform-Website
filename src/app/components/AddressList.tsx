@@ -22,7 +22,7 @@ import {
 } from "reactstrap"
 import { useSelector } from "react-redux"
 import { RootState } from "../../store"
-import { getUserAddresses } from "../../services/authService";
+import { getUserAddresses, deleteAddress } from "../../services/authService";
 import { showSuccess, showError } from '../../utils/toast';
 import { useRouter } from "next/navigation"
 
@@ -32,13 +32,6 @@ const AddressList = () => {
     (state: RootState) => state.auth.userData
   )
   const [addressData, setAddressData] = useState<any>([])
-
-  const handleChange = (e: any) => {
-    setAddressData((prev: any) => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }))
-  }
 
   const fetchUserAddresses = async () => {
     const res = await getUserAddresses(userData.userId);
@@ -55,18 +48,18 @@ const AddressList = () => {
     }
   }
 
-  // const onUpdate = async (e: any) => {
-  //   e.preventDefault();
-  //   const res = await updateUser(userData.userId, userDetails);
-  //   const { success, message, data, error } = res.data
-  //   if (success) {
-  //     showSuccess(message);
-  //     // console.log(data);
-  //   } else {
-  //     showError(message);
-  //     console.error("Server error:", error);
-  //   }
-  // }
+  const onDelete = async (id: any) => {
+    const res = await deleteAddress(id);
+    const { success, message, data, error } = res.data
+    if (success) {
+      showSuccess(message);
+      // console.log(data);
+      fetchUserAddresses()
+    } else {
+      showError(message);
+      console.error("Server error:", error);
+    }
+  }
 
   useEffect(() => {
     fetchUserAddresses();
@@ -112,16 +105,18 @@ const AddressList = () => {
                         Card subtitle
                       </CardSubtitle> */}
                       <CardText>
-                        Some quick example text to build on the card title and make up the bulk of the card‘s content.
+                        Some quick example text to build on the card title and make up the bulk of the card&apos;s content.
                       </CardText>
                       <div className="d-flex">
-                        <Button color="danger" size="sm" className="text-uppercase me-2" >
+                        <Button color="danger" size="sm" className="text-uppercase me-2">
                           Edit
                         </Button>
-                        <Button color="danger" size="sm" className="text-uppercase me-2" >
+                        <Button color="danger" size="sm" className="text-uppercase me-2" onClick={() => {
+                          onDelete(ad.id)
+                        }}>
                           Delete
                         </Button>
-                        {!ad.isDefault && <Button color="danger" size="sm" className="text-uppercase me-2" >
+                        {!ad.isDefault && <Button color="danger" size="sm" className="text-uppercase me-2">
                           Make Default
                         </Button>}
                       </div>
