@@ -13,6 +13,12 @@ import {
   Container,
   Row,
   Button,
+  Card,
+  CardBody,
+  CardTitle,
+  CardSubtitle,
+  CardText,
+  Badge,
 } from "reactstrap"
 import { useSelector } from "react-redux"
 import { RootState } from "../../store"
@@ -68,85 +74,78 @@ const AddressList = () => {
 
 
   return (
-    <Container fluid="sm">
+    <Container fluid="sm" className="mb-5">
       {addressData.length === 0 && (
         <Row>
           <Col className={`d-flex justify-content-center flex-column align-items-center ${styles.no_data_div}`}>
             <h6 className="text-danger py-3 px-5">No Addresses found</h6>
             <Button color="danger" className="text-uppercase" onClick={() => {
-              router.push("addresses/add")
+              router.push("/addresses/add")
             }}>
               Add
             </Button>
           </Col>
         </Row>
       )}
-      {/* <Row>
-          <Col md={6}>
-            <FormGroup>
-              <Label for="fName">
-                First Name
-              </Label>
-              <Input
-                id="fName"
-                name="firstName"
-                placeholder="John"
-                type="text"
-                onChange={handleChange}
-                value={userDetails?.firstName || ""}
-              />
-            </FormGroup>
-          </Col>
-          <Col md={6}>
-            <FormGroup>
-              <Label for="lName">
-                Last Name
-              </Label>
-              <Input
-                id="lName"
-                name="lastName"
-                placeholder="Doe"
-                type="text"
-                onChange={handleChange}
-                value={userDetails?.lastName || ""}
-              />
-            </FormGroup>
+      {addressData.length > 0 && (
+        <>
+          <Row>
+            {addressData.map((ad: any, adIndex: number) => {
+              return (
+                <Col key={adIndex}>
+                  <Card
+                    className="p-3"
+                  >
+                    <CardBody>
+                      <CardTitle tag="h5" className="text-capitalize">
+                        {ad.addressType}
+                        {ad.isDefault && (
+                          <Badge className="ms-2">
+                            Default
+                          </Badge>
+                        )}
+                      </CardTitle>
+                      {/* <CardSubtitle
+                        className="mb-2 text-muted"
+                        tag="h6"
+                      >
+                        Card subtitle
+                      </CardSubtitle> */}
+                      <CardText>
+                        Some quick example text to build on the card title and make up the bulk of the card‘s content.
+                      </CardText>
+                      <div className="d-flex">
+                        <Button color="danger" size="sm" className="text-uppercase me-2" >
+                          Edit
+                        </Button>
+                        <Button color="danger" size="sm" className="text-uppercase me-2" >
+                          Delete
+                        </Button>
+                        <Button color="danger" size="sm" className="text-uppercase me-2" >
+                          Make Default
+                        </Button>
+                      </div>
+                    </CardBody>
+                  </Card>
+                </Col>
+              )
+            })}
+          </Row>
+        </>
+      )}
+      {addressData.length > 0 && (
+        <Row>
+          <Col className={`d-flex justify-content-center flex-column align-items-center mt-3`}>
+            <Button color="danger" className="text-uppercase" onClick={() => {
+              router.push("/addresses/add")
+            }}>
+              Add More
+            </Button>
           </Col>
         </Row>
-        <Row>
-          <Col md={6}>
-            <FormGroup>
-              <Label for="email">
-                Email
-              </Label>
-              <Input
-                id="email"
-                name="email"
-                placeholder="abc@gmail.com"
-                type="email"
-                disabled
-                value={userDetails?.email || ""}
-              />
-            </FormGroup>
-          </Col>
-          <Col md={6}>
-            <FormGroup>
-              <Label for="mNumber">
-                Mobile Number
-              </Label>
-              <Input
-                id="mNumber"
-                name="mobileNumber"
-                placeholder="Enter mobile number"
-                type="text"
-                onChange={handleChange}
-                value={userDetails?.mobileNumber || ""}
-              />
-            </FormGroup>
-          </Col>
-        </Row> */}
+      )}
 
-    </Container>
+    </Container >
   )
 }
 
