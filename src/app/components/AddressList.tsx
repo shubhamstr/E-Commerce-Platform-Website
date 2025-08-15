@@ -92,7 +92,7 @@ const AddressList = () => {
           <Row>
             {addressData.map((ad: any, adIndex: number) => {
               return (
-                <Col key={adIndex}>
+                <Col key={adIndex} md="6" className="mb-3">
                   <Card
                     className="p-3"
                   >
@@ -121,9 +121,9 @@ const AddressList = () => {
                         <Button color="danger" size="sm" className="text-uppercase me-2" >
                           Delete
                         </Button>
-                        <Button color="danger" size="sm" className="text-uppercase me-2" >
+                        {!ad.isDefault && <Button color="danger" size="sm" className="text-uppercase me-2" >
                           Make Default
-                        </Button>
+                        </Button>}
                       </div>
                     </CardBody>
                   </Card>
