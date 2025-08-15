@@ -48,7 +48,7 @@ const ChangePasswordForm = () => {
     } else if (userDetails.confirmNewPassword === "") {
       showError("Confirm New password is required.");
       return false
-    } else if (userDetails.confirmNewPassword === userDetails.confirmNewPassword) {
+    } else if (userDetails.confirmNewPassword !== userDetails.confirmNewPassword) {
       showError("New password is not matching with confirm password.");
       return false
     }
@@ -57,6 +57,11 @@ const ChangePasswordForm = () => {
     if (success) {
       showSuccess(message);
       // console.log(data);
+      setUserDetails({
+        currentPassword: "",
+        newPassword: "",
+        confirmNewPassword: "",
+      })
     } else {
       showError(message);
       console.error("Server error:", error);
