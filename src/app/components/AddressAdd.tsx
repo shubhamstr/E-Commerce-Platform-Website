@@ -21,7 +21,7 @@ import {
 } from "reactstrap"
 import { useSelector } from "react-redux"
 import { RootState } from "../../store"
-import { addAddress } from "../../services/authService";
+import { addAddress, getAddress, updateAddress } from "../../services/authService";
 import { showSuccess, showError } from '../../utils/toast';
 import { useRouter } from "next/navigation"
 
@@ -41,23 +41,55 @@ const AddressList = ({ adId = null }) => {
     }))
   }
 
-  const onCreate = async (e: any) => {
+  const onSubmit = async (e: any) => {
     e.preventDefault();
     console.log(addressDetails)
-    const res = await addAddress(addressDetails);
-    const { success, message, data, error } = res.data
-    if (success) {
-      showSuccess(message);
-      // console.log(data);
-      router.push("/addresses")
+    if (!adId) {
+      const res = await addAddress(addressDetails);
+      const { success, message, data, error } = res.data
+      if (success) {
+        showSuccess(message);
+        // console.log(data);
+        router.push("/addresses")
+      } else {
+        showError(message);
+        console.error("Server error:", error);
+      }
     } else {
-      showError(message);
-      console.error("Server error:", error);
+      const res = await updateAddress(adId, addressDetails);
+      const { success, message, data, error } = res.data
+      if (success) {
+        showSuccess(message);
+        // console.log(data);
+        router.push("/addresses")
+      } else {
+        showError(message);
+        console.error("Server error:", error);
+      }
     }
   }
 
   const getAddressDetails = async (id: any) => {
-
+    const res = await getAddress(id);
+    const { success, message, data, error } = res.data
+    if (success) {
+      showSuccess(message);
+      // console.log(data);
+      if (data) {
+        setAddressDetails((prev: any) => ({
+          ...prev,
+          addressLine1: data.addressLine1,
+          addressLine2: data.addressLine2,
+          city: data.city,
+          state: data.state,
+          pinCode: data.pinCode,
+          addressType: data.addressType,
+        }))
+      }
+    } else {
+      showError(message);
+      console.error("Server error:", error);
+    }
   }
 
   useEffect(() => {
@@ -180,7 +212,7 @@ const AddressList = ({ adId = null }) => {
         </Row>
         <Row>
           <Col className="text-end">
-            <Button color="danger" className="text-uppercase" onClick={onCreate}>
+            <Button color="danger" className="text-uppercase" onClick={onSubmit}>
               {adId ? "Edit" : "Add"}
             </Button>
           </Col>
