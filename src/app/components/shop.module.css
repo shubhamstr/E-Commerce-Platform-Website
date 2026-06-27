@@ -11,3 +11,10 @@
   height: 14px;
   width: 14px;
 }
+
+.stickySidebar {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 80px;
+  align-self: start;
+}

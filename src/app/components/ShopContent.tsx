@@ -31,6 +31,7 @@ const ShopContent = () => {
   const [dropdownOpen1, setDropdownOpen1] = useState(false);
   const [dropdownOpen2, setDropdownOpen2] = useState(false);
   const [value, setValue] = React.useState<number[]>([0, 500]);
+  const [debouncedValue, setDebouncedValue] = useState<number[]>([0, 500]);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
@@ -44,6 +45,16 @@ const ShopContent = () => {
 
   const toggle1 = () => setDropdownOpen1((prevState) => !prevState);
   const toggle2 = () => setDropdownOpen2((prevState) => !prevState);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, 300);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -75,6 +86,9 @@ const ShopContent = () => {
         if (selectedColor) {
           filtersObj.colors = { value: selectedColor };
         }
+        if (debouncedValue) {
+          filtersObj.price = { value: debouncedValue };
+        }
         if (Object.keys(filtersObj).length > 0) {
           params.filters = JSON.stringify(filtersObj);
         }
@@ -87,7 +101,7 @@ const ShopContent = () => {
       }
     };
     fetchProducts();
-  }, [categoryId, selectedSize, selectedColor]);
+  }, [categoryId, selectedSize, selectedColor, debouncedValue]);
 
   return (
     <Container fluid="sm">
@@ -165,105 +179,107 @@ const ShopContent = () => {
           </Row>
         </Col>
         <Col xs="12" sm="12" md="4">
-          <Card
-            style={{
-              width: '18rem'
-            }}
-          >
-            <CardBody>
-              <CardTitle tag="h6" className="fs-6 fw-medium text-uppercase mb-3">
-                Categories
-              </CardTitle>
-              <ul className={styles.listStyle}>
-                <li
-                  className={`py-1 d-flex justify-content-between ${!categoryId ? 'text-black fw-bold' : 'text-primary'
-                    } ${styles.pointer}`}
-                  onClick={() => router.push('/shop')}
-                >
-                  <p className="m-0">All Categories</p>
-                </li>
-                {categories.map((category: any) => {
-                  const isActive = categoryId === String(category.id);
-                  return (
-                    <li
-                      key={category.id}
-                      className={`py-1 d-flex justify-content-between ${isActive ? 'text-black fw-bold' : 'text-primary'
-                        } ${styles.pointer}`}
-                      onClick={() => router.push(`/shop?category=${category.id}`)}
-                    >
-                      <p className="m-0">{category.name}</p>
-                      <span>({category.productCount || 0})</span>
-                    </li>
-                  )
-                })}
-              </ul>
-            </CardBody>
-          </Card>
-          <Card
-            style={{
-              width: '18rem'
-            }}
-            className="mt-3"
-          >
-            <CardBody>
-              <CardTitle tag="h6" className="fs-6 fw-medium text-uppercase mb-3">
-                Filter by Price
-              </CardTitle>
-              <div className="">
-                <Slider value={value} step={10} min={0} max={500} onChange={handleChange} valueLabelDisplay="auto" />
-                <p>
-                  ${value[0]} - ${value[1]}
-                </p>
-              </div>
-              <CardTitle tag="h6" className="fs-6 fw-medium text-uppercase mb-3 mt-5">
-                Size
-              </CardTitle>
-              <ul className={styles.listStyle}>
-                {['S', 'M', 'L', 'XL'].map((size) => (
-                  <li key={size} className="py-1">
-                    <Input
-                      type="checkbox"
-                      id={`size-${size}`}
-                      className="me-2"
-                      checked={selectedSize === size}
-                      onChange={() => setSelectedSize(selectedSize === size ? null : size)}
-                    />
-                    <Label
-                      className={`${styles.pointer} user-select-none ${selectedSize === size ? 'fw-bold text-black' : 'text-primary'}`}
-                      check
-                      for={`size-${size}`}
-                    >
-                      {size === 'S' ? 'Small (S)' : size === 'M' ? 'Medium (M)' : size === 'L' ? 'Large (L)' : 'Extra Large (XL)'}
-                    </Label>
-                  </li>
-                ))}
-              </ul>
-              <CardTitle tag="h6" className="fs-6 fw-medium text-uppercase mb-3 mt-5">
-                Color
-              </CardTitle>
-              <ul className={styles.listStyle}>
-                {[
-                  { name: 'Red', class: 'bg-danger' },
-                  { name: 'Green', class: 'bg-success' },
-                  { name: 'Blue', class: 'bg-info' },
-                  { name: 'Purple', class: 'bg-primary' },
-                  { name: 'Black', class: 'bg-dark' },
-                  { name: 'White', class: 'bg-light border' }
-                ].map((color) => (
+          <div className={styles.stickySidebar}>
+            <Card
+              style={{
+                width: '18rem'
+              }}
+            >
+              <CardBody>
+                <CardTitle tag="h6" className="fs-6 fw-medium text-uppercase mb-3">
+                  Categories
+                </CardTitle>
+                <ul className={styles.listStyle}>
                   <li
-                    key={color.name}
-                    className={`py-1 d-flex justify-content-between ${selectedColor === color.name ? 'text-black fw-bold' : 'text-primary'} ${styles.pointer}`}
-                    onClick={() => setSelectedColor(selectedColor === color.name ? null : color.name)}
+                    className={`py-1 d-flex justify-content-between ${!categoryId ? 'text-black fw-bold' : 'text-primary'
+                      } ${styles.pointer}`}
+                    onClick={() => router.push('/shop')}
                   >
-                    <p className="m-0 d-flex align-items-center">
-                      <span className={`${color.class} color d-inline-block rounded-circle me-2 ${styles.colorTag}`}></span>
-                      <span>{color.name}</span>
-                    </p>
+                    <p className="m-0">All Categories</p>
                   </li>
-                ))}
-              </ul>
-            </CardBody>
-          </Card>
+                  {categories.map((category: any) => {
+                    const isActive = categoryId === String(category.id);
+                    return (
+                      <li
+                        key={category.id}
+                        className={`py-1 d-flex justify-content-between ${isActive ? 'text-black fw-bold' : 'text-primary'
+                          } ${styles.pointer}`}
+                        onClick={() => router.push(`/shop?category=${category.id}`)}
+                      >
+                        <p className="m-0">{category.name}</p>
+                        <span>({category.productCount || 0})</span>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </CardBody>
+            </Card>
+            <Card
+              style={{
+                width: '18rem'
+              }}
+              className="mt-3"
+            >
+              <CardBody>
+                <CardTitle tag="h6" className="fs-6 fw-medium text-uppercase mb-3">
+                  Filter by Price
+                </CardTitle>
+                <div className="">
+                  <Slider value={value} step={10} min={0} max={500} onChange={handleChange} valueLabelDisplay="auto" />
+                  <p>
+                    ${value[0]} - ${value[1]}
+                  </p>
+                </div>
+                <CardTitle tag="h6" className="fs-6 fw-medium text-uppercase mb-3 mt-5">
+                  Size
+                </CardTitle>
+                <ul className={styles.listStyle}>
+                  {['S', 'M', 'L', 'XL'].map((size) => (
+                    <li key={size} className="py-1">
+                      <Input
+                        type="checkbox"
+                        id={`size-${size}`}
+                        className="me-2"
+                        checked={selectedSize === size}
+                        onChange={() => setSelectedSize(selectedSize === size ? null : size)}
+                      />
+                      <Label
+                        className={`${styles.pointer} user-select-none ${selectedSize === size ? 'fw-bold text-black' : 'text-primary'}`}
+                        check
+                        for={`size-${size}`}
+                      >
+                        {size === 'S' ? 'Small (S)' : size === 'M' ? 'Medium (M)' : size === 'L' ? 'Large (L)' : 'Extra Large (XL)'}
+                      </Label>
+                    </li>
+                  ))}
+                </ul>
+                <CardTitle tag="h6" className="fs-6 fw-medium text-uppercase mb-3 mt-5">
+                  Color
+                </CardTitle>
+                <ul className={styles.listStyle}>
+                  {[
+                    { name: 'Red', class: 'bg-danger' },
+                    { name: 'Green', class: 'bg-success' },
+                    { name: 'Blue', class: 'bg-info' },
+                    { name: 'Purple', class: 'bg-primary' },
+                    { name: 'Black', class: 'bg-dark' },
+                    { name: 'White', class: 'bg-light border' }
+                  ].map((color) => (
+                    <li
+                      key={color.name}
+                      className={`py-1 d-flex justify-content-between ${selectedColor === color.name ? 'text-black fw-bold' : 'text-primary'} ${styles.pointer}`}
+                      onClick={() => setSelectedColor(selectedColor === color.name ? null : color.name)}
+                    >
+                      <p className="m-0 d-flex align-items-center">
+                        <span className={`${color.class} color d-inline-block rounded-circle me-2 ${styles.colorTag}`}></span>
+                        <span>{color.name}</span>
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </CardBody>
+            </Card>
+          </div>
         </Col>
       </Row>
     </Container>
