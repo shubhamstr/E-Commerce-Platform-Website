@@ -21,6 +21,7 @@ import {
 import ProductCard from './ProductCard';
 import Slider from '@mui/material/Slider';
 import styles from './shop.module.css';
+import { getProducts } from '../../services/productService';
 
 const ShopContent = () => {
   const [productList, setProductList] = useState<any>([]);
@@ -36,38 +37,19 @@ const ShopContent = () => {
   const toggle2 = () => setDropdownOpen2((prevState) => !prevState);
 
   useEffect(() => {
-    setProductList([
-      {
-        image: '/model_1.png',
-        title: 'Smooth Cloth',
-        price: 28
-      },
-      {
-        image: '/model_5.png',
-        title: 'Denim Jacket',
-        price: 28
-      },
-      {
-        image: '/model_7.png',
-        title: 'Yellow Jacket',
-        price: 58
-      },
-      {
-        image: '/prod_1.png',
-        title: 'Leather Green Bag',
-        price: 28
-      },
-      {
-        image: '/prod_2.png',
-        title: 'Gray Shoe',
-        price: 20
-      },
-      {
-        image: '/prod_3.png',
-        title: 'Blue Shoe High Heels',
-        price: 28
+    const fetchProducts = async () => {
+      try {
+        const res = await getProducts({
+          params: { page: 1, limit: 12 }
+        });
+        if (res.data && res.data.success) {
+          setProductList(res.data.data.records || []);
+        }
+      } catch (error) {
+        console.error("Error fetching products in ShopContent:", error);
       }
-    ]);
+    };
+    fetchProducts();
   }, []);
 
   return (

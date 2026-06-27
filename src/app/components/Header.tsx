@@ -23,8 +23,10 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"
 import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "../../store"
 import { login, logout, setUserData } from "../../store/slices/authSlice"
-import { jwtDecode } from "jwt-decode";
-import { showError } from '../../utils/toast';
+import { setWishlist, clearWishlist } from "../../store/slices/wishlistSlice"
+import { getWishlist } from "../../services/wishlistService"
+import { jwtDecode } from "jwt-decode"
+import { showError } from "../../utils/toast"
 
 function Header(args: any) {
   const isAuthenticated = useSelector(
@@ -38,22 +40,40 @@ function Header(args: any) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const token = localStorage.getItem("ecomToken");
+      const token = localStorage.getItem("ecomToken")
       if (token) {
         try {
-          const decoded = jwtDecode(token);
-          console.log("Decoded JWT:", decoded);
-          const { userId }: any = decoded;
-          dispatch(login());
-          dispatch(setUserData({ userId }));
+          const decoded = jwtDecode(token)
+          console.log("Decoded JWT:", decoded)
+          const { userId }: any = decoded
+          dispatch(login())
+          dispatch(setUserData({ userId }))
         } catch (error) {
-          console.error("Invalid JWT:", error);
-          showError("Invalid JWT");
+          console.error("Invalid JWT:", error)
+          showError("Invalid JWT")
         }
       }
     }
-  }, [dispatch]);
+  }, [dispatch])
 
+  // Fetch wishlist items when user is authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      const fetchWishlist = async () => {
+        try {
+          const res = await getWishlist()
+          if (res.data && res.data.success) {
+            dispatch(setWishlist(res.data.data || []))
+          }
+        } catch (error) {
+          console.error("Error fetching wishlist in header:", error)
+        }
+      }
+      fetchWishlist()
+    } else {
+      dispatch(clearWishlist())
+    }
+  }, [isAuthenticated, dispatch])
 
   return (
     <div>
@@ -86,17 +106,19 @@ function Header(args: any) {
                   Shop
                 </NavLink>
               </NavItem>
-              <NavItem>
-                <NavLink
-                  href="/wishlist/"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    router.push("/wishlist")
-                  }}
-                >
-                  Wishlist
-                </NavLink>
-              </NavItem>
+              {isAuthenticated && (
+                <NavItem>
+                  <NavLink
+                    href="/wishlist/"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      router.push("/wishlist")
+                    }}
+                  >
+                    Wishlist
+                  </NavLink>
+                </NavItem>
+              )}
               <NavItem>
                 <NavLink
                   href="/contact/"
@@ -130,19 +152,29 @@ function Header(args: any) {
                     <DropdownItem
                       onClick={() => {
                         router.push("/account")
-                      }}>Account</DropdownItem>
+                      }}
+                    >
+                      Account
+                    </DropdownItem>
                     <DropdownItem
                       onClick={() => {
                         router.push("/addresses")
-                      }}>Addresses</DropdownItem>
+                      }}
+                    >
+                      Addresses
+                    </DropdownItem>
                     <DropdownItem
                       onClick={() => {
                         router.push("/change-password")
-                      }}>Change Password</DropdownItem>
+                      }}
+                    >
+                      Change Password
+                    </DropdownItem>
                     <DropdownItem divider />
                     <DropdownItem
                       onClick={() => {
                         dispatch(logout())
+                        dispatch(clearWishlist())
                         localStorage.removeItem("ecomToken")
                         router.push("/")
                       }}
