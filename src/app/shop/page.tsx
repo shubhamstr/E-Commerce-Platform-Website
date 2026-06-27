@@ -1,4 +1,4 @@
-import React from "react"
+import React, { Suspense } from "react"
 import { Container, Row, Col } from "reactstrap"
 import LandingSection from "../components/LandingSection"
 import BreadcrumbCompo from "../components/BreadcrumbCompo"
@@ -25,7 +25,9 @@ const page = () => {
       </Row>
       <Row xs="1">
         <Col>
-          <ShopContent />
+          <Suspense fallback={<div className="text-center py-5">Loading shop...</div>}>
+            <ShopContent />
+          </Suspense>
         </Col>
       </Row>
       <Row xs="1">

@@ -22,12 +22,19 @@ import ProductCard from './ProductCard';
 import Slider from '@mui/material/Slider';
 import styles from './shop.module.css';
 import { getProducts } from '../../services/productService';
+import { getAllCategories } from '../../services/categoryService';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 const ShopContent = () => {
   const [productList, setProductList] = useState<any>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [dropdownOpen1, setDropdownOpen1] = useState(false);
   const [dropdownOpen2, setDropdownOpen2] = useState(false);
   const [value, setValue] = React.useState<number[]>([0, 500]);
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const categoryId = searchParams.get("category");
 
   const handleChange = (event: Event, newValue: number[]) => {
     setValue(newValue);
@@ -37,11 +44,31 @@ const ShopContent = () => {
   const toggle2 = () => setDropdownOpen2((prevState) => !prevState);
 
   useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await getAllCategories({
+          params: { page: 1, limit: 100 }
+        });
+        if (res.data && res.data.success) {
+          setCategories(res.data.data.records || []);
+        }
+      } catch (error) {
+        console.error("Error fetching categories in ShopContent:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await getProducts({
-          params: { page: 1, limit: 12 }
-        });
+        const params: any = { page: 1, limit: 12 };
+        if (categoryId) {
+          params.filters = JSON.stringify({
+            categoryId: { value: categoryId }
+          });
+        }
+        const res = await getProducts({ params });
         if (res.data && res.data.success) {
           setProductList(res.data.data.records || []);
         }
@@ -50,7 +77,7 @@ const ShopContent = () => {
       }
     };
     fetchProducts();
-  }, []);
+  }, [categoryId]);
 
   return (
     <Container fluid="sm">
@@ -138,15 +165,29 @@ const ShopContent = () => {
                 Categories
               </CardTitle>
               <ul className={styles.listStyle}>
-                <li className={`py-1 d-flex justify-content-between text-primary ${styles.pointer}`}>
-                  <p className="m-0">Women</p> <span>(2000)</span>
+                <li
+                  className={`py-1 d-flex justify-content-between ${
+                    !categoryId ? 'text-black fw-bold' : 'text-primary'
+                  } ${styles.pointer}`}
+                  onClick={() => router.push('/shop')}
+                >
+                  <p className="m-0">All Categories</p>
                 </li>
-                <li className={`py-1 d-flex justify-content-between text-primary ${styles.pointer}`}>
-                  <p className="m-0">Men</p> <span>(2000)</span>
-                </li>
-                <li className={`py-1 d-flex justify-content-between text-primary ${styles.pointer}`}>
-                  <p className="m-0">Children</p> <span>(2000)</span>
-                </li>
+                {categories.map((category: any) => {
+                  const isActive = categoryId === String(category.id);
+                  return (
+                    <li
+                      key={category.id}
+                      className={`py-1 d-flex justify-content-between ${
+                        isActive ? 'text-black fw-bold' : 'text-primary'
+                      } ${styles.pointer}`}
+                      onClick={() => router.push(`/shop?category=${category.id}`)}
+                    >
+                      <p className="m-0">{category.name}</p>
+                      <span>({category.productCount || 0})</span>
+                    </li>
+                  )
+                })}
               </ul>
             </CardBody>
           </Card>

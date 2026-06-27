@@ -69,7 +69,7 @@ const Collections = () => {
                     }}
                     className={`position-absolute top-50 start-50 ${styles.collectionBtn}`}
                   >
-                    {category.name} <small className={styles.smallText}>25 items</small>
+                    {category.name} <small className={styles.smallText}>{category.productCount || 0} items</small>
                   </Button>
                 </div>
               </Col>
