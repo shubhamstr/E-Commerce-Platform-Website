@@ -6,8 +6,8 @@ import { Container, Row, Col, Card, CardBody, Badge, Button, Collapse } from "re
 import { useRouter } from "next/navigation"
 import { useSelector } from "react-redux"
 import { RootState } from "../../store"
-import { getMyOrders } from "../../services/orderService"
-import { showError } from "../../utils/toast"
+import { getMyOrders, cancelOrder } from "../../services/orderService"
+import { showError, showSuccess } from "../../utils/toast"
 import BreadcrumbCompo from "../components/BreadcrumbCompo"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import ExpandLessIcon from "@mui/icons-material/ExpandLess"
@@ -22,6 +22,7 @@ const OrdersPage = () => {
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [openOrders, setOpenOrders] = useState<{ [key: number]: boolean }>({})
+  const [cancellingId, setCancellingId] = useState<number | null>(null)
 
   const fetchOrders = async () => {
     try {
@@ -60,6 +61,28 @@ const OrdersPage = () => {
     }))
   }
 
+  const handleCancelOrder = async (orderId: number) => {
+    if (!window.confirm("Are you sure you want to cancel this order?")) {
+      return
+    }
+    setCancellingId(orderId)
+    try {
+      const res = await cancelOrder(orderId)
+      const { success, message } = res.data
+      if (success) {
+        showSuccess(message || "Order cancelled successfully.")
+        fetchOrders()
+      } else {
+        showError(message || "Failed to cancel order.")
+      }
+    } catch (error: any) {
+      console.error("Error cancelling order:", error)
+      showError(error.response?.data?.message || "Failed to cancel order.")
+    } finally {
+      setCancellingId(null)
+    }
+  }
+
   const getStatusBadgeColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "pending":
@@ -71,6 +94,9 @@ const OrdersPage = () => {
       case "delivered":
         return "success"
       case "cancelled":
+      case "cancelled by customer":
+      case "cancelled by seller":
+      case "cancelled by admin":
         return "danger"
       default:
         return "secondary"
@@ -148,7 +174,18 @@ const OrdersPage = () => {
                           {order.status}
                         </Badge>
                       </div>
-                      <div>
+                      <div className="d-flex align-items-center gap-2">
+                        {(order.status === "pending" || order.status === "processing") && (
+                          <Button
+                            color="danger"
+                            size="sm"
+                            className="text-uppercase font-weight-bold"
+                            onClick={() => handleCancelOrder(order.id)}
+                            disabled={cancellingId === order.id}
+                          >
+                            {cancellingId === order.id ? "Cancelling..." : "Cancel Order"}
+                          </Button>
+                        )}
                         <Button color="secondary" outline size="sm" onClick={() => toggleOrder(order.id)} className="d-flex align-items-center gap-1">
                           {isOpen ? <>Hide Details <ExpandLessIcon /></> : <>View Details <ExpandMoreIcon /></>}
                         </Button>

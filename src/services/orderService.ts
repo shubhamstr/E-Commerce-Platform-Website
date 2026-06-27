@@ -5,3 +5,5 @@ export const placeOrder = (addressId: number) =>
   api.post("/api/order/checkout", { addressId })
 
 export const getMyOrders = () => api.get("/api/order/my")
+
+export const cancelOrder = (orderId: number) => api.put(`/api/order/${orderId}/cancel`)
