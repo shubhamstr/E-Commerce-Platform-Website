@@ -5,6 +5,7 @@ import BreadcrumbCompo from "../components/BreadcrumbCompo"
 import ShopContent from "../components/ShopContent"
 import Collections from "../components/Collections"
 import styles from "./page.module.css"
+import PopularCategories from "../components/PopularCategories"
 
 const page = () => {
   return (
@@ -28,6 +29,11 @@ const page = () => {
           <Suspense fallback={<div className="text-center py-5">Loading shop...</div>}>
             <ShopContent />
           </Suspense>
+        </Col>
+      </Row>
+      <Row xs="1">
+        <Col>
+          <PopularCategories />
         </Col>
       </Row>
       <Row xs="1">
