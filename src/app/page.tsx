@@ -4,6 +4,7 @@ import LandingSection from "./components/LandingSection"
 import PopularProducts from "./components/PopularProducts"
 import MostRatedProducts from "./components/MostRatedProducts"
 import Collections from "./components/Collections"
+import PopularCategories from "./components/PopularCategories"
 import styles from "./page.module.css"
 
 export default function Home() {
@@ -17,6 +18,11 @@ export default function Home() {
       <Row xs="1">
         <Col>
           <Collections />
+        </Col>
+      </Row>
+      <Row xs="1">
+        <Col>
+          <PopularCategories />
         </Col>
       </Row>
       <Row xs="1">
