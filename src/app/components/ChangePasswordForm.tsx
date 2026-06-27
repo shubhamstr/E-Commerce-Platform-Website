@@ -16,6 +16,8 @@ import { useSelector } from "react-redux"
 import { RootState } from "../../store"
 import { updatePassword } from "../../services/authService";
 import { showSuccess, showError } from '../../utils/toast';
+import VisibilityIcon from "@mui/icons-material/Visibility"
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff"
 // import { useRouter } from "next/navigation"
 
 const ChangePasswordForm = () => {
@@ -28,6 +30,10 @@ const ChangePasswordForm = () => {
     newPassword: "",
     confirmNewPassword: "",
   })
+
+  const [showCurrent, setShowCurrent] = useState(false)
+  const [showNew, setShowNew] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   const handleChange = (e: any) => {
     setUserDetails((prev: any) => ({
@@ -48,7 +54,7 @@ const ChangePasswordForm = () => {
     } else if (userDetails.confirmNewPassword === "") {
       showError("Confirm New password is required.");
       return false
-    } else if (userDetails.confirmNewPassword !== userDetails.confirmNewPassword) {
+    } else if (userDetails.newPassword !== userDetails.confirmNewPassword) {
       showError("New password is not matching with confirm password.");
       return false
     }
@@ -81,14 +87,36 @@ const ChangePasswordForm = () => {
               <Label for="currentPassword">
                 Current Password
               </Label>
-              <Input
-                id="currentPassword"
-                name="currentPassword"
-                placeholder="Enter current password"
-                type="text"
-                onChange={handleChange}
-                value={userDetails?.currentPassword || ""}
-              />
+              <div className="position-relative">
+                <Input
+                  id="currentPassword"
+                  name="currentPassword"
+                  placeholder="Enter current password"
+                  type={showCurrent ? "text" : "password"}
+                  onChange={handleChange}
+                  value={userDetails?.currentPassword || ""}
+                  style={{ paddingRight: "40px" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrent(!showCurrent)}
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    cursor: "pointer",
+                    color: "#6c757d",
+                    display: "flex",
+                    alignItems: "center"
+                  }}
+                >
+                  {showCurrent ? <VisibilityOffIcon style={{ fontSize: "20px" }} /> : <VisibilityIcon style={{ fontSize: "20px" }} />}
+                </button>
+              </div>
             </FormGroup>
           </Col>
           <Col sm={{
@@ -99,14 +127,36 @@ const ChangePasswordForm = () => {
               <Label for="newPassword">
                 New Password
               </Label>
-              <Input
-                id="newPassword"
-                name="newPassword"
-                placeholder="Enter new password"
-                type="text"
-                onChange={handleChange}
-                value={userDetails?.newPassword || ""}
-              />
+              <div className="position-relative">
+                <Input
+                  id="newPassword"
+                  name="newPassword"
+                  placeholder="Enter new password"
+                  type={showNew ? "text" : "password"}
+                  onChange={handleChange}
+                  value={userDetails?.newPassword || ""}
+                  style={{ paddingRight: "40px" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNew(!showNew)}
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    cursor: "pointer",
+                    color: "#6c757d",
+                    display: "flex",
+                    alignItems: "center"
+                  }}
+                >
+                  {showNew ? <VisibilityOffIcon style={{ fontSize: "20px" }} /> : <VisibilityIcon style={{ fontSize: "20px" }} />}
+                </button>
+              </div>
             </FormGroup>
           </Col>
         </Row>
@@ -119,14 +169,36 @@ const ChangePasswordForm = () => {
               <Label for="confirmNewPassword">
                 Confirm New Password
               </Label>
-              <Input
-                id="confirmNewPassword"
-                name="confirmNewPassword"
-                placeholder="Enter new password again"
-                type="text"
-                onChange={handleChange}
-                value={userDetails?.confirmNewPassword || ""}
-              />
+              <div className="position-relative">
+                <Input
+                  id="confirmNewPassword"
+                  name="confirmNewPassword"
+                  placeholder="Enter new password again"
+                  type={showConfirm ? "text" : "password"}
+                  onChange={handleChange}
+                  value={userDetails?.confirmNewPassword || ""}
+                  style={{ paddingRight: "40px" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    cursor: "pointer",
+                    color: "#6c757d",
+                    display: "flex",
+                    alignItems: "center"
+                  }}
+                >
+                  {showConfirm ? <VisibilityOffIcon style={{ fontSize: "20px" }} /> : <VisibilityIcon style={{ fontSize: "20px" }} />}
+                </button>
+              </div>
             </FormGroup>
           </Col>
         </Row>

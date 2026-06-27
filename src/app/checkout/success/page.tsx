@@ -58,9 +58,9 @@ const CheckoutSuccessPage = () => {
                   outline
                   size="lg"
                   className="px-4 text-uppercase"
-                  onClick={() => router.push("/account")}
+                  onClick={() => router.push("/orders")}
                 >
-                  Go to My Account
+                  Go to My Orders
                 </Button>
               </div>
             </CardBody>
