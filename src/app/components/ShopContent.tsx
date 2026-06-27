@@ -113,7 +113,7 @@ const ShopContent = () => {
               </div>
             </Col>
             <Col xs="12" sm="12" md="12">
-              <div className="d-flex flex-wrap gap-5 justify-content-around mt-3">
+              <div className="d-flex flex-wrap gap-5 justify-content-start mt-3">
                 {productList.map((product: any, index: any) => {
                   return <ProductCard key={index} index={index} product={product} screen="shop" />;
                 })}
@@ -166,9 +166,8 @@ const ShopContent = () => {
               </CardTitle>
               <ul className={styles.listStyle}>
                 <li
-                  className={`py-1 d-flex justify-content-between ${
-                    !categoryId ? 'text-black fw-bold' : 'text-primary'
-                  } ${styles.pointer}`}
+                  className={`py-1 d-flex justify-content-between ${!categoryId ? 'text-black fw-bold' : 'text-primary'
+                    } ${styles.pointer}`}
                   onClick={() => router.push('/shop')}
                 >
                   <p className="m-0">All Categories</p>
@@ -178,9 +177,8 @@ const ShopContent = () => {
                   return (
                     <li
                       key={category.id}
-                      className={`py-1 d-flex justify-content-between ${
-                        isActive ? 'text-black fw-bold' : 'text-primary'
-                      } ${styles.pointer}`}
+                      className={`py-1 d-flex justify-content-between ${isActive ? 'text-black fw-bold' : 'text-primary'
+                        } ${styles.pointer}`}
                       onClick={() => router.push(`/shop?category=${category.id}`)}
                     >
                       <p className="m-0">{category.name}</p>

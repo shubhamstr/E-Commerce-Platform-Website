@@ -26,7 +26,6 @@ import { login, logout, setUserData } from "../../store/slices/authSlice"
 import { setWishlist, clearWishlist } from "../../store/slices/wishlistSlice"
 import { getWishlist } from "../../services/wishlistService"
 import { jwtDecode } from "jwt-decode"
-import { showError } from "../../utils/toast"
 
 function Header(args: any) {
   const isAuthenticated = useSelector(
