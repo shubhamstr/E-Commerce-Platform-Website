@@ -73,7 +73,6 @@ const AddressList = ({ adId = null }) => {
     const res = await getAddress(id);
     const { success, message, data, error } = res.data
     if (success) {
-      showSuccess(message);
       // console.log(data);
       if (data) {
         setAddressDetails((prev: any) => ({

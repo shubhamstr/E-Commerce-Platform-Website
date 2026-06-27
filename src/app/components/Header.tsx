@@ -45,12 +45,12 @@ function Header(args: any) {
         try {
           const decoded = jwtDecode(token)
           console.log("Decoded JWT:", decoded)
-          const { userId }: any = decoded
+          const { userId, firstName, lastName, email }: any = decoded
           dispatch(login())
-          dispatch(setUserData({ userId }))
+          dispatch(setUserData({ userId, firstName, lastName, email }))
         } catch (error) {
           console.error("Invalid JWT:", error)
-          showError("Invalid JWT")
+          localStorage.removeItem("ecomToken")
         }
       }
     }

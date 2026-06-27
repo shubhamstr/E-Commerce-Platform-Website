@@ -37,7 +37,6 @@ const AccountForm = () => {
     const res = await getUser(userData.userId);
     const { success, message, data, error } = res.data
     if (success) {
-      showSuccess(message);
       // console.log(data);
       if (data) {
         setUserDetails({
@@ -67,8 +66,10 @@ const AccountForm = () => {
   }
 
   useEffect(() => {
-    fetchUserData();
-  }, [])
+    if (userData && userData.userId) {
+      fetchUserData();
+    }
+  }, [userData?.userId])
 
 
   return (

@@ -37,7 +37,7 @@ const AddressList = () => {
     const res = await getUserAddresses(userData.userId);
     const { success, message, data, error } = res.data
     if (success) {
-      showSuccess(message);
+      // showSuccess(message);
       // console.log(data);
       if (data.length) {
         setAddressData(data);
@@ -81,8 +81,10 @@ const AddressList = () => {
   }
 
   useEffect(() => {
-    fetchUserAddresses();
-  }, [])
+    if (userData && userData.userId) {
+      fetchUserAddresses();
+    }
+  }, [userData?.userId])
 
 
   return (
