@@ -11,9 +11,11 @@ const api = axios.create({
 
 // Add token dynamically if needed
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("ecomToken")
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("ecomToken")
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
   }
   return config
 })

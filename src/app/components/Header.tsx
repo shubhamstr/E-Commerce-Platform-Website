@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Collapse,
   Navbar,
@@ -36,25 +36,24 @@ function Header(args: any) {
 
   const toggle = () => setIsOpen(!isOpen)
 
-  if (localStorage.ecomToken) {
-    const token = localStorage.getItem("ecomToken");
-    console.log(token)
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        console.log("Decoded JWT:", decoded);
-        // showSuccess("Invalid JWT")
-        const { userId }: any = decoded
-        dispatch(login())
-        dispatch(setUserData(
-          { userId: userId }
-        ))
-      } catch (error) {
-        console.error("Invalid JWT:", error);
-        showError("Invalid JWT")
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("ecomToken");
+      if (token) {
+        try {
+          const decoded = jwtDecode(token);
+          console.log("Decoded JWT:", decoded);
+          const { userId }: any = decoded;
+          dispatch(login());
+          dispatch(setUserData({ userId }));
+        } catch (error) {
+          console.error("Invalid JWT:", error);
+          showError("Invalid JWT");
+        }
       }
     }
-  }
+  }, [dispatch]);
+
 
   return (
     <div>
