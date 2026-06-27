@@ -213,7 +213,18 @@ const CartList = () => {
               <p>Total</p>
               <p>${subtotal.toFixed(2)}</p>
             </div>
-            <Button color="danger" className="text-uppercase w-100">
+            <Button
+              color="danger"
+              className="text-uppercase w-100"
+              onClick={() => {
+                if (isAuthenticated) {
+                  router.push("/checkout")
+                } else {
+                  showError("Please login to proceed to checkout.")
+                  router.push("/login")
+                }
+              }}
+            >
               Proceed to Checkout
             </Button>
           </Col>
