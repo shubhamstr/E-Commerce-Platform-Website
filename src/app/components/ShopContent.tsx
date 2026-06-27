@@ -31,6 +31,8 @@ const ShopContent = () => {
   const [dropdownOpen1, setDropdownOpen1] = useState(false);
   const [dropdownOpen2, setDropdownOpen2] = useState(false);
   const [value, setValue] = React.useState<number[]>([0, 500]);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -63,10 +65,18 @@ const ShopContent = () => {
     const fetchProducts = async () => {
       try {
         const params: any = { page: 1, limit: 12 };
+        const filtersObj: any = {};
         if (categoryId) {
-          params.filters = JSON.stringify({
-            categoryId: { value: categoryId }
-          });
+          filtersObj.categoryId = { value: categoryId };
+        }
+        if (selectedSize) {
+          filtersObj.sizes = { value: selectedSize };
+        }
+        if (selectedColor) {
+          filtersObj.colors = { value: selectedColor };
+        }
+        if (Object.keys(filtersObj).length > 0) {
+          params.filters = JSON.stringify(filtersObj);
         }
         const res = await getProducts({ params });
         if (res.data && res.data.success) {
@@ -77,7 +87,7 @@ const ShopContent = () => {
       }
     };
     fetchProducts();
-  }, [categoryId]);
+  }, [categoryId, selectedSize, selectedColor]);
 
   return (
     <Container fluid="sm">
@@ -209,53 +219,48 @@ const ShopContent = () => {
                 Size
               </CardTitle>
               <ul className={styles.listStyle}>
-                <li>
-                  <Input type="checkbox" id="smallCheck" className="me-2" />
-                  <Label className={`${styles.pointer} user-select-none`} check for="smallCheck">
-                    Small (2400)
-                  </Label>
-                </li>
-                <li>
-                  <Input type="checkbox" id="mediumCheck" className="me-2" />
-                  <Label className={`${styles.pointer} user-select-none`} check for="mediumCheck">
-                    Medium (1200)
-                  </Label>
-                </li>
-                <li>
-                  <Input type="checkbox" id="largeCheck" className="me-2" />
-                  <Label className={`${styles.pointer} user-select-none`} check for="largeCheck">
-                    Large (1300)
-                  </Label>
-                </li>
+                {['S', 'M', 'L', 'XL'].map((size) => (
+                  <li key={size} className="py-1">
+                    <Input
+                      type="checkbox"
+                      id={`size-${size}`}
+                      className="me-2"
+                      checked={selectedSize === size}
+                      onChange={() => setSelectedSize(selectedSize === size ? null : size)}
+                    />
+                    <Label
+                      className={`${styles.pointer} user-select-none ${selectedSize === size ? 'fw-bold text-black' : 'text-primary'}`}
+                      check
+                      for={`size-${size}`}
+                    >
+                      {size === 'S' ? 'Small (S)' : size === 'M' ? 'Medium (M)' : size === 'L' ? 'Large (L)' : 'Extra Large (XL)'}
+                    </Label>
+                  </li>
+                ))}
               </ul>
               <CardTitle tag="h6" className="fs-6 fw-medium text-uppercase mb-3 mt-5">
                 Color
               </CardTitle>
               <ul className={styles.listStyle}>
-                <li className={`py-1 d-flex justify-content-between text-primary ${styles.pointer}`}>
-                  <p className="m-0 d-flex align-items-center">
-                    <span className={`bg-danger color d-inline-block rounded-circle me-2 ${styles.colorTag}`}></span>
-                    <span>Red (2,429)</span>
-                  </p>
-                </li>
-                <li className={`py-1 d-flex justify-content-between text-primary ${styles.pointer}`}>
-                  <p className="m-0 d-flex align-items-center">
-                    <span className={`bg-success color d-inline-block rounded-circle me-2 ${styles.colorTag}`}></span>
-                    <span>Green (2,429)</span>
-                  </p>
-                </li>
-                <li className={`py-1 d-flex justify-content-between text-primary ${styles.pointer}`}>
-                  <p className="m-0 d-flex align-items-center">
-                    <span className={`bg-info color d-inline-block rounded-circle me-2 ${styles.colorTag}`}></span>
-                    <span>Blue (2,429)</span>
-                  </p>
-                </li>
-                <li className={`py-1 d-flex justify-content-between text-primary ${styles.pointer}`}>
-                  <p className="m-0 d-flex align-items-center">
-                    <span className={`bg-primary color d-inline-block rounded-circle me-2 ${styles.colorTag}`}></span>
-                    <span>Purple (2,429)</span>
-                  </p>
-                </li>
+                {[
+                  { name: 'Red', class: 'bg-danger' },
+                  { name: 'Green', class: 'bg-success' },
+                  { name: 'Blue', class: 'bg-info' },
+                  { name: 'Purple', class: 'bg-primary' },
+                  { name: 'Black', class: 'bg-dark' },
+                  { name: 'White', class: 'bg-light border' }
+                ].map((color) => (
+                  <li
+                    key={color.name}
+                    className={`py-1 d-flex justify-content-between ${selectedColor === color.name ? 'text-black fw-bold' : 'text-primary'} ${styles.pointer}`}
+                    onClick={() => setSelectedColor(selectedColor === color.name ? null : color.name)}
+                  >
+                    <p className="m-0 d-flex align-items-center">
+                      <span className={`${color.class} color d-inline-block rounded-circle me-2 ${styles.colorTag}`}></span>
+                      <span>{color.name}</span>
+                    </p>
+                  </li>
+                ))}
               </ul>
             </CardBody>
           </Card>
