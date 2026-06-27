@@ -8,7 +8,7 @@
     "url": "git+https://github.com/shubhamstr/E-Commerce-Platform-Website.git"
   },
   "scripts": {
-    "dev": "next dev --turbopack -p 4005",
+    "dev": "npx kill-port 4005 && next dev --turbopack -p 4005",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
