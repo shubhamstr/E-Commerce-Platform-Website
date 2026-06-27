@@ -16,7 +16,7 @@ const Collections = () => {
     const fetchCategories = async () => {
       try {
         const res = await getAllCategories({
-          params: { page: 1, limit: 12 }
+          params: { page: 1, limit: 12, isFeatured: true }
         })
         if (res.data.success) {
           setCategories(res.data.data.records || [])
