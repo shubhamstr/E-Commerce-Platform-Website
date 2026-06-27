@@ -4,8 +4,13 @@ import React from "react"
 import { Card, CardBody, CardTitle, CardSubtitle, Button } from "reactstrap"
 import Image from "next/image"
 import styles from "./product.module.css"
+import { SERVER_URL } from "../../utils/constants"
 
 const ProductCard = ({ index, product, screen }: any) => {
+  const imageUrl = product.imageUrl
+    ? (product.imageUrl.startsWith("http") ? product.imageUrl : `${SERVER_URL}${product.imageUrl}`)
+    : (product.image || "/model_1.png")
+
   return (
     <Card
       key={index}
@@ -15,14 +20,14 @@ const ProductCard = ({ index, product, screen }: any) => {
     >
       <Image
         alt="Sample"
-        src={product.image}
+        src={imageUrl}
         width={screen === "shop" ? 382 : 287}
         height={150}
         style={{ objectFit: "contain" }}
         className={styles.bgColor}
       />
       <CardBody>
-        <CardTitle tag="h5">{product.title}</CardTitle>
+        <CardTitle tag="h5">{product.name || product.title}</CardTitle>
         <CardSubtitle className="mb-2 text-muted" tag="h6">
           ${product.price}
         </CardSubtitle>
