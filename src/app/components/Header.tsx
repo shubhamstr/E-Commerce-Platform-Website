@@ -180,6 +180,13 @@ function Header(args: any) {
                     </DropdownItem>
                     <DropdownItem
                       onClick={() => {
+                        router.push("/orders")
+                      }}
+                    >
+                      My Orders
+                    </DropdownItem>
+                    <DropdownItem
+                      onClick={() => {
                         router.push("/change-password")
                       }}
                     >
