@@ -25,12 +25,16 @@ import { RootState } from "../../store"
 import { login, logout, setUserData } from "../../store/slices/authSlice"
 import { setWishlist, clearWishlist } from "../../store/slices/wishlistSlice"
 import { getWishlist } from "../../services/wishlistService"
+import { setCart, clearCartState } from "../../store/slices/cartSlice"
+import { getCart } from "../../services/cartService"
 import { jwtDecode } from "jwt-decode"
 
 function Header(args: any) {
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated
   )
+  const wishlistItems = useSelector((state: RootState) => state.wishlist.items)
+  const cartItems = useSelector((state: RootState) => state.cart.items)
   const dispatch = useDispatch()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
@@ -55,7 +59,7 @@ function Header(args: any) {
     }
   }, [dispatch])
 
-  // Fetch wishlist items when user is authenticated
+  // Fetch wishlist and cart items when user is authenticated
   useEffect(() => {
     if (isAuthenticated) {
       const fetchWishlist = async () => {
@@ -68,9 +72,21 @@ function Header(args: any) {
           console.error("Error fetching wishlist in header:", error)
         }
       }
+      const fetchCart = async () => {
+        try {
+          const res = await getCart()
+          if (res.data && res.data.success) {
+            dispatch(setCart(res.data.data || []))
+          }
+        } catch (error) {
+          console.error("Error fetching cart in header:", error)
+        }
+      }
       fetchWishlist()
+      fetchCart()
     } else {
       dispatch(clearWishlist())
+      dispatch(clearCartState())
     }
   }, [isAuthenticated, dispatch])
 
@@ -139,7 +155,7 @@ function Header(args: any) {
                     router.push("/cart")
                   }}
                 >
-                  <ShoppingCartIcon /> Cart
+                  <ShoppingCartIcon /> Cart {isAuthenticated && cartItems.length > 0 ? `(${cartItems.reduce((acc, item) => acc + item.quantity, 0)})` : ""}
                 </NavLink>
               </NavItem>
               {isAuthenticated ? (
@@ -174,6 +190,7 @@ function Header(args: any) {
                       onClick={() => {
                         dispatch(logout())
                         dispatch(clearWishlist())
+                        dispatch(clearCartState())
                         localStorage.removeItem("ecomToken")
                         router.push("/")
                       }}

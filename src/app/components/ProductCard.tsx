@@ -9,6 +9,8 @@ import { useSelector, useDispatch } from "react-redux"
 import { RootState } from "../../store"
 import { addToWishlist, removeFromWishlist } from "../../store/slices/wishlistSlice"
 import { toggleWishlist } from "../../services/wishlistService"
+import { addToCartState } from "../../store/slices/cartSlice"
+import { addToCart } from "../../services/cartService"
 import { showSuccess, showError } from "../../utils/toast"
 import FavoriteIcon from "@mui/icons-material/Favorite"
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder"
@@ -48,6 +50,32 @@ const ProductCard = ({ index, product, screen }: any) => {
     } catch (error: any) {
       console.error("Wishlist toggle error:", error)
       showError(error.response?.data?.message || "Failed to update wishlist.")
+    }
+  }
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!isAuthenticated) {
+      showError("Please log in to add products to the cart.")
+      return
+    }
+    if (!product.id) {
+      showError("Product ID is invalid.")
+      return
+    }
+
+    try {
+      const res = await addToCart(product.id, 1)
+      if (res.data && res.data.success) {
+        dispatch(addToCartState(res.data.data))
+        showSuccess(`${product.name || product.title || "Product"} added to cart.`)
+      } else {
+        showError(res.data.message || "Failed to add to cart.")
+      }
+    } catch (error: any) {
+      console.error("Add to cart error:", error)
+      showError(error.response?.data?.message || "Failed to add to cart.")
     }
   }
 
@@ -111,7 +139,7 @@ const ProductCard = ({ index, product, screen }: any) => {
         </CardSubtitle>
         {/* <CardText>Some quick example text to build on the card title and make up the bulk of the card‘s content.</CardText> */}
         <div className="d-flex gap-2">
-          <Button color="primary" size="sm" outline>
+          <Button color="primary" size="sm" outline onClick={handleAddToCart}>
             Add to Cart
           </Button>
           <Button color="danger" size="sm" outline>
