@@ -13,7 +13,7 @@ const PopularProducts = () => {
     const fetchProducts = async () => {
       try {
         const res = await getProducts({
-          params: { page: 1, limit: 6 }
+          params: { page: 1, limit: 6, sortField: "popular", sortOrder: -1 }
         })
         if (res.data.success) {
           setProductList(res.data.data.records || [])

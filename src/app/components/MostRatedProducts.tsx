@@ -13,7 +13,7 @@ const MostRatedProducts = () => {
     const fetchProducts = async () => {
       try {
         const res = await getProducts({
-          params: { page: 1, limit: 6, sortField: "name", sortOrder: 1 }
+          params: { page: 1, limit: 6, sortField: "rated", sortOrder: -1 }
         })
         if (res.data.success) {
           setProductList(res.data.data.records || [])
