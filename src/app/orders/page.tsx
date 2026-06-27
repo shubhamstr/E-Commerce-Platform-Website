@@ -2,17 +2,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 import React, { useEffect, useState } from "react"
-import { Container, Row, Col, Card, CardBody, Badge, Button, Collapse } from "reactstrap"
+import { Container, Row, Col, Card, CardBody, Badge, Button, Collapse, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Label, Input } from "reactstrap"
 import { useRouter } from "next/navigation"
 import { useSelector } from "react-redux"
 import { RootState } from "../../store"
-import { getMyOrders, cancelOrder } from "../../services/orderService"
+import { getMyOrders, cancelOrder, submitReview } from "../../services/orderService"
 import { showError, showSuccess } from "../../utils/toast"
 import BreadcrumbCompo from "../components/BreadcrumbCompo"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import ExpandLessIcon from "@mui/icons-material/ExpandLess"
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag"
 import LocalShippingIcon from "@mui/icons-material/LocalShipping"
+import StarIcon from "@mui/icons-material/Star"
+import StarBorderIcon from "@mui/icons-material/StarBorder"
+import RateReviewIcon from "@mui/icons-material/RateReview"
 
 const OrdersPage = () => {
   const router = useRouter()
@@ -23,6 +26,60 @@ const OrdersPage = () => {
   const [loading, setLoading] = useState(true)
   const [openOrders, setOpenOrders] = useState<{ [key: number]: boolean }>({})
   const [cancellingId, setCancellingId] = useState<number | null>(null)
+
+  // Review Modal State
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
+  const [reviewOrderId, setReviewOrderId] = useState<number | null>(null)
+  const [reviewProductId, setReviewProductId] = useState<number | null>(null)
+  const [reviewProductName, setReviewProductName] = useState("")
+  const [rating, setRating] = useState(0)
+  const [hoverRating, setHoverRating] = useState(0)
+  const [comment, setComment] = useState("")
+  const [submittingReview, setSubmittingReview] = useState(false)
+
+  const openReviewModal = (orderId: number, productId: number | null, productName: string, existingReview?: any) => {
+    setReviewOrderId(orderId)
+    setReviewProductId(productId)
+    setReviewProductName(productName)
+    if (existingReview) {
+      setRating(existingReview.rating)
+      setComment(existingReview.comment || "")
+    } else {
+      setRating(0)
+      setComment("")
+    }
+    setIsReviewModalOpen(true)
+  }
+
+  const handleReviewSubmit = async () => {
+    if (!reviewOrderId || !reviewProductId) return
+    if (rating === 0) {
+      showError("Please select a rating of at least 1 star.")
+      return
+    }
+
+    setSubmittingReview(true)
+    try {
+      const res = await submitReview({
+        orderId: reviewOrderId,
+        productId: reviewProductId,
+        rating,
+        comment,
+      })
+      if (res.data.success) {
+        showSuccess(res.data.message || "Review submitted successfully.")
+        setIsReviewModalOpen(false)
+        fetchOrders()
+      } else {
+        showError(res.data.message || "Failed to submit review.")
+      }
+    } catch (error: any) {
+      console.error("Error submitting review:", error)
+      showError(error.response?.data?.message || "Failed to submit review.")
+    } finally {
+      setSubmittingReview(false)
+    }
+  }
 
   const fetchOrders = async () => {
     try {
@@ -198,15 +255,56 @@ const OrdersPage = () => {
                           <Col md="7">
                             <h6 className="text-dark font-weight-bold text-uppercase border-bottom pb-2 mb-3">Items Ordered</h6>
                             <div className="d-flex flex-column gap-3">
-                              {order.items?.map((item: any, idx: number) => (
-                                <div key={item.id || idx} className="d-flex align-items-center justify-content-between border-bottom pb-2">
-                                  <div>
-                                    <span className="font-weight-bold text-dark d-block">{item.product?.name || "Unknown Product"}</span>
-                                    <span className="text-muted small">Qty: {item.quantity} × ${parseFloat(item.price).toFixed(2)}</span>
+                              {order.items?.map((item: any, idx: number) => {
+                                const isDelivered = order.status?.toLowerCase() === "delivered"
+                                const existingReview = isDelivered ? order.reviews?.find((r: any) => r.productId === item.productId) : null
+                                return (
+                                  <div key={item.id || idx} className="border-bottom pb-3 mb-2">
+                                    <div className="d-flex align-items-center justify-content-between">
+                                      <div>
+                                        <span className="font-weight-bold text-dark d-block">{item.product?.name || "Unknown Product"}</span>
+                                        <span className="text-muted small">Qty: {item.quantity} × ${parseFloat(item.price).toFixed(2)}</span>
+                                      </div>
+                                      <span className="font-weight-bold text-dark">${(parseFloat(item.price) * item.quantity).toFixed(2)}</span>
+                                    </div>
+                                    {isDelivered && (
+                                      <div className="d-flex align-items-center justify-content-between mt-2 pt-1 border-top border-light">
+                                        <div>
+                                          {existingReview ? (
+                                            <div className="d-flex align-items-center gap-1 flex-wrap">
+                                              <span className="text-muted small">Your rating:</span>
+                                              <span className="text-warning font-weight-bold d-flex align-items-center">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                  star <= existingReview.rating ? (
+                                                    <StarIcon key={star} style={{ fontSize: "16px" }} />
+                                                  ) : (
+                                                    <StarBorderIcon key={star} style={{ fontSize: "16px", color: "#ccc" }} />
+                                                  )
+                                                ))}
+                                              </span>
+                                              {existingReview.comment && (
+                                                <span className="text-muted small italic ml-2">({existingReview.comment})</span>
+                                              )}
+                                            </div>
+                                          ) : (
+                                            <span className="text-muted small italic">Not reviewed yet</span>
+                                          )}
+                                        </div>
+                                        <Button
+                                          color="warning"
+                                          outline
+                                          size="sm"
+                                          style={{ fontSize: "11px", padding: "2px 8px" }}
+                                          className="d-flex align-items-center gap-1"
+                                          onClick={() => openReviewModal(order.id, item.productId, item.product?.name || "Product", existingReview)}
+                                        >
+                                          <RateReviewIcon style={{ fontSize: "12px" }} /> {existingReview ? "Edit Review" : "Write Review"}
+                                        </Button>
+                                      </div>
+                                    )}
                                   </div>
-                                  <span className="font-weight-bold text-dark">${(parseFloat(item.price) * item.quantity).toFixed(2)}</span>
-                                </div>
-                              ))}
+                                )
+                              })}
                             </div>
                           </Col>
 
@@ -229,6 +327,49 @@ const OrdersPage = () => {
                             ) : (
                               <p className="text-muted small">No shipping address recorded.</p>
                             )}
+
+                            {order.status?.toLowerCase() === "delivered" && (
+                              <div className="mt-4 pt-3 border-top">
+                                <h6 className="text-dark font-weight-bold text-uppercase pb-2 mb-2 d-flex align-items-center gap-2">
+                                  <RateReviewIcon color="action" /> Rate Order Experience
+                                </h6>
+                                {(() => {
+                                  const orderReview = order.reviews?.find((r: any) => r.productId === null)
+                                  return (
+                                    <div className="d-flex flex-column gap-2">
+                                      {orderReview ? (
+                                        <div className="d-flex align-items-center gap-1 flex-wrap">
+                                          <span className="text-muted small">Your rating:</span>
+                                          <span className="text-warning font-weight-bold d-flex align-items-center">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                              star <= orderReview.rating ? (
+                                                <StarIcon key={star} style={{ fontSize: "16px" }} />
+                                              ) : (
+                                                <StarBorderIcon key={star} style={{ fontSize: "16px", color: "#ccc" }} />
+                                              )
+                                            ))}
+                                          </span>
+                                          {orderReview.comment && (
+                                            <div className="text-muted small italic w-100">"{orderReview.comment}"</div>
+                                          )}
+                                        </div>
+                                      ) : (
+                                        <span className="text-muted small italic">You haven't rated this order experience yet.</span>
+                                      )}
+                                      <Button
+                                        color="primary"
+                                        outline
+                                        size="sm"
+                                        className="mt-2 w-100 d-flex align-items-center justify-content-center gap-1"
+                                        onClick={() => openReviewModal(order.id, null, `Order #${order.id}`, orderReview)}
+                                      >
+                                        <RateReviewIcon style={{ fontSize: "14px" }} /> {orderReview ? "Edit Order Rating" : "Rate Order"}
+                                      </Button>
+                                    </div>
+                                  )
+                                })()}
+                              </div>
+                            )}
                           </Col>
                         </Row>
                       </CardBody>
@@ -240,6 +381,87 @@ const OrdersPage = () => {
           )}
         </Col>
       </Row>
+      {/* Review Modal */}
+      <Modal isOpen={isReviewModalOpen} toggle={() => setIsReviewModalOpen(false)} centered>
+        <ModalHeader toggle={() => setIsReviewModalOpen(false)} className="border-0 pb-0">
+          <span className="font-weight-bold text-dark h4">
+            {reviewProductId ? "Product Review" : "Order Review"}
+          </span>
+        </ModalHeader>
+        <ModalBody className="pt-2">
+          <p className="text-muted mb-4">
+            {reviewProductId ? (
+              <>How would you rate <strong>{reviewProductName}</strong>?</>
+            ) : (
+              <>How would you rate your experience for <strong>{reviewProductName}</strong>?</>
+            )}
+          </p>
+
+          <FormGroup className="mb-4 text-center">
+            <Label className="d-block text-muted small text-uppercase font-weight-bold mb-3">Star Rating</Label>
+            <div className="d-flex justify-content-center gap-2">
+              {[1, 2, 3, 4, 5].map((star) => {
+                const isActive = star <= (hoverRating || rating)
+                return (
+                  <button
+                    key={star}
+                    type="button"
+                    style={{
+                      background: "none",
+                      border: "none",
+                      outline: "none",
+                      cursor: "pointer",
+                      padding: 0,
+                      transition: "transform 0.15s ease",
+                      transform: hoverRating === star ? "scale(1.2)" : "scale(1)",
+                    }}
+                    onClick={() => setRating(star)}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                  >
+                    {isActive ? (
+                      <StarIcon style={{ fontSize: "40px", color: "#ffb400" }} />
+                    ) : (
+                      <StarBorderIcon style={{ fontSize: "40px", color: "#ccc" }} />
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+            {rating > 0 && (
+              <span className="d-block mt-2 font-weight-bold text-warning" style={{ fontSize: "14px" }}>
+                {rating === 1 ? "Terrible" : rating === 2 ? "Bad" : rating === 3 ? "Average" : rating === 4 ? "Good" : "Excellent"}
+              </span>
+            )}
+          </FormGroup>
+
+          <FormGroup className="mb-3">
+            <Label className="text-muted small text-uppercase font-weight-bold mb-2">Write your review (optional)</Label>
+            <Input
+              type="textarea"
+              rows="4"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Tell us what you liked or disliked about this product..."
+              className="form-control rounded-3 border-light shadow-sm"
+              style={{ resize: "none", backgroundColor: "#f9f9f9" }}
+            />
+          </FormGroup>
+        </ModalBody>
+        <ModalFooter className="border-0 pt-0">
+          <Button color="light" className="text-uppercase font-weight-bold px-4" onClick={() => setIsReviewModalOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            color="warning"
+            className="text-uppercase font-weight-bold px-4 text-white"
+            onClick={handleReviewSubmit}
+            disabled={submittingReview}
+          >
+            {submittingReview ? "Submitting..." : "Submit Review"}
+          </Button>
+        </ModalFooter>
+      </Modal>
     </Container>
   )
 }
