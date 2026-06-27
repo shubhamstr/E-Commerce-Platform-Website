@@ -52,7 +52,7 @@ const OrdersPage = () => {
   }
 
   const handleReviewSubmit = async () => {
-    if (!reviewOrderId || !reviewProductId) return
+    if (!reviewOrderId) return
     if (rating === 0) {
       showError("Please select a rating of at least 1 star.")
       return

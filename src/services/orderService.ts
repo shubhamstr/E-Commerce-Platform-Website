@@ -8,6 +8,6 @@ export const getMyOrders = () => api.get("/api/order/my")
 
 export const cancelOrder = (orderId: number) => api.put(`/api/order/${orderId}/cancel`)
 
-export const submitReview = (reviewData: { orderId: number; productId: number; rating: number; comment?: string }) =>
+export const submitReview = (reviewData: { orderId: number; productId: number | null; rating: number; comment?: string }) =>
   api.post("/api/review", reviewData)
 
