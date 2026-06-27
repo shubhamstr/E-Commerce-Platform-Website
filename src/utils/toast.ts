@@ -1,8 +1,8 @@
 // src/utils/toast.ts
 import { toast } from "react-toastify"
 
-export const showSuccess = (message: string) => {
-  toast.success(message)
+export const showSuccess = (message: string, options?: Parameters<typeof toast.success>[1]) => {
+  toast.success(message, options)
 }
 
 export const showError = (message: string) => {

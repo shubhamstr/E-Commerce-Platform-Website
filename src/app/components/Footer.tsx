@@ -32,6 +32,9 @@ function Footer() {
                   <li className="p-2">
                     <NavLink href="/shop/">Shop</NavLink>
                   </li>
+                  <li className="p-2">
+                    <NavLink href="http://localhost:4010/ecom/seller-login" target="_blank" rel="noopener noreferrer">Seller Login</NavLink>
+                  </li>
                 </ul>
               </Col>
               <Col>
