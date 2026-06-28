@@ -276,7 +276,7 @@ const TrackOrderContent = () => {
                       <div className="text-muted">
                         <div className="font-weight-bold text-dark mb-1">Standard Home Delivery</div>
                         <div>{order.address.city}, {order.address.state}</div>
-                        <div>{order.address.postalCode}, {order.address.country}</div>
+                        <div>{order.address.pinCode}</div>
                       </div>
                     ) : (
                       <span className="text-muted italic">No address details available</span>
