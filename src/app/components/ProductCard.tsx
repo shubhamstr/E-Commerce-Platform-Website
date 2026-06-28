@@ -92,6 +92,33 @@ const ProductCard = ({ index, product, screen }: any) => {
     }
   }
 
+  const handleBuyNow = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!isAuthenticated) {
+      showError("Please log in to purchase products.")
+      return
+    }
+    if (!product.id) {
+      showError("Product ID is invalid.")
+      return
+    }
+
+    try {
+      const res = await addToCart(product.id, 1)
+      if (res.data && res.data.success) {
+        dispatch(addToCartState(res.data.data))
+        showSuccess(`${product.name || product.title || "Product"} added to cart.`)
+        router.push("/cart")
+      } else {
+        showError(res.data.message || "Failed to add to cart.")
+      }
+    } catch (error: any) {
+      console.error("Buy now error:", error)
+      showError(error.response?.data?.message || "Failed to add to cart.")
+    }
+  }
+
   return (
     <Card
       key={index}
@@ -226,7 +253,7 @@ const ProductCard = ({ index, product, screen }: any) => {
           <Button color="primary" size="sm" outline onClick={handleAddToCart}>
             Add to Cart
           </Button>
-          <Button color="danger" size="sm" outline>
+          <Button color="danger" size="sm" outline onClick={handleBuyNow}>
             Buy Now
           </Button>
         </div>
