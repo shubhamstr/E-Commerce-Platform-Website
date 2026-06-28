@@ -14,9 +14,12 @@ import { addToCart } from "../../services/cartService"
 import { showSuccess, showError } from "../../utils/toast"
 import FavoriteIcon from "@mui/icons-material/Favorite"
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder"
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
+import { useRouter } from "next/navigation"
 
 const ProductCard = ({ index, product, screen }: any) => {
   const dispatch = useDispatch()
+  const router = useRouter()
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated)
   const wishlistItems = useSelector((state: RootState) => state.wishlist.items)
   
@@ -87,6 +90,43 @@ const ProductCard = ({ index, product, screen }: any) => {
         position: "relative",
       }}
     >
+      {product.createdById && (
+        <button
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            router.push(`/seller/${product.createdById}`)
+          }}
+          style={{
+            position: "absolute",
+            top: "12px",
+            left: "12px",
+            background: "rgba(255, 255, 255, 0.9)",
+            border: "none",
+            borderRadius: "50%",
+            width: "36px",
+            height: "36px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.2)",
+            cursor: "pointer",
+            zIndex: 10,
+            transition: "transform 0.2s ease, background-color 0.2s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "scale(1.1)"
+            e.currentTarget.style.backgroundColor = "#ffffff"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "scale(1)"
+            e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.9)"
+          }}
+          title="View Seller Profile"
+        >
+          <InfoOutlinedIcon style={{ color: "#0d6efd", fontSize: "20px" }} />
+        </button>
+      )}
       {isAuthenticated && (
         <button
           onClick={handleWishlistToggle}
