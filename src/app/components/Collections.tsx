@@ -50,7 +50,7 @@ const Collections = () => {
           </Col>
         </Row>
       ) : (
-        <Row xs="1" sm="2" className="pb-5 g-4">
+        <Row xs="1" sm="2" md="4" className="pb-5 g-4">
           {categories.map((category) => {
             const imageUrl = category.imageUrl
               ? `${SERVER_URL}${category.imageUrl}`

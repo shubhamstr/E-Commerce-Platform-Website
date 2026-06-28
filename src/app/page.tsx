@@ -12,7 +12,12 @@ export default function Home() {
     <Container fluid>
       <Row xs="1" className={styles.bgColor}>
         <Col>
-          <LandingSection bgClass="homeBg" />
+          <LandingSection 
+            bgClass="homeBg" 
+            badge="# Explore the Ultimate Variety"
+            title="All-in-One Marketplace"
+            subtitle="Explore high-quality electronics, home essentials, beauty products, fashion wear & more, all delivered straight to your door."
+          />
         </Col>
       </Row>
       <Row xs="1">

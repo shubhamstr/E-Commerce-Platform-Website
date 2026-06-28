@@ -12,7 +12,12 @@ const page = () => {
     <Container fluid>
       <Row xs="1" className={styles.bgColor}>
         <Col>
-          <LandingSection bgClass="shopBg" />
+          <LandingSection 
+            bgClass="shopBg" 
+            badge="# Curated Collections"
+            title="Shop All Categories"
+            subtitle="Browse through our vast catalog of top-rated items, curated just for you across electronics, home decor, apparel and wellness."
+          />
         </Col>
       </Row>
       <Row xs="1">

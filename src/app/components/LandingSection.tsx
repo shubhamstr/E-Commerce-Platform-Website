@@ -5,7 +5,7 @@ import { Button, Col, Container, Row } from "reactstrap"
 import { useRouter } from "next/navigation"
 import styles from "./landing.module.css"
 
-const LandingSection = ({ bgClass }: any) => {
+const LandingSection = ({ bgClass, badge = "# New Summer Collection 2025", title = "Arrivals Sales", subtitle }: any) => {
   const router = useRouter()
   return (
     <Container fluid="sm">
@@ -18,15 +18,21 @@ const LandingSection = ({ bgClass }: any) => {
         <Col
           className={`d-flex flex-column justify-content-center align-items-center`}
         >
-          <p className="text-black text-uppercase fw-medium">
-            # New Summer Collection 2025
+          <p className="text-black text-uppercase fw-medium text-center">
+            {badge}
           </p>
-          <h1 className="text-black text-uppercase fw-bolder">
-            Arrivals Sales
+          <h1 className="text-black text-uppercase fw-bolder text-center">
+            {title}
           </h1>
+          {subtitle && (
+            <p className="text-muted text-center mt-2 px-3">
+              {subtitle}
+            </p>
+          )}
           <Button
             color="primary"
             outline
+            className="mt-3"
             onClick={(e) => {
               e.preventDefault()
               router.push("/shop")
