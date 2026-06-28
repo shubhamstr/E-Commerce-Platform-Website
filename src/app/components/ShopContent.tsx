@@ -34,6 +34,7 @@ const ShopContent = () => {
   const [debouncedValue, setDebouncedValue] = useState<number[]>([0, 500]);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<string>('latest');
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -92,6 +93,37 @@ const ShopContent = () => {
         if (Object.keys(filtersObj).length > 0) {
           params.filters = JSON.stringify(filtersObj);
         }
+
+        // Sorting mapping
+        if (sortBy === 'latest') {
+          params.sortField = 'createdAt';
+          params.sortOrder = -1;
+        } else if (sortBy === 'popular') {
+          params.sortField = 'popular';
+          params.sortOrder = -1;
+        } else if (sortBy === 'most_purchased') {
+          params.sortField = 'most_purchased';
+          params.sortOrder = -1;
+        } else if (sortBy === 'most_rated') {
+          params.sortField = 'most_rated';
+          params.sortOrder = -1;
+        } else if (sortBy === 'relevance') {
+          params.sortField = 'createdAt';
+          params.sortOrder = -1;
+        } else if (sortBy === 'name_asc') {
+          params.sortField = 'name';
+          params.sortOrder = 1;
+        } else if (sortBy === 'name_desc') {
+          params.sortField = 'name';
+          params.sortOrder = -1;
+        } else if (sortBy === 'price_asc') {
+          params.sortField = 'price';
+          params.sortOrder = 1;
+        } else if (sortBy === 'price_desc') {
+          params.sortField = 'price';
+          params.sortOrder = -1;
+        }
+
         const res = await getProducts({ params });
         if (res.data && res.data.success) {
           setProductList(res.data.data.records || []);
@@ -101,7 +133,7 @@ const ShopContent = () => {
       }
     };
     fetchProducts();
-  }, [categoryId, selectedSize, selectedColor, debouncedValue]);
+  }, [categoryId, selectedSize, selectedColor, debouncedValue, sortBy]);
 
   return (
     <Container fluid="sm">
@@ -113,24 +145,34 @@ const ShopContent = () => {
                 <h4>Shop All</h4>
                 <div className="d-flex gap-2">
                   <Dropdown isOpen={dropdownOpen1} toggle={toggle1}>
-                    <DropdownToggle caret>Latest</DropdownToggle>
+                    <DropdownToggle caret>
+                      {sortBy === 'latest' ? 'Latest' :
+                       sortBy === 'popular' ? 'Popular' :
+                       sortBy === 'most_purchased' ? 'Most Purchased' :
+                       sortBy === 'most_rated' ? 'Most Rated' : 'Sort By'}
+                    </DropdownToggle>
                     <DropdownMenu>
-                      <DropdownItem>Latest</DropdownItem>
-                      <DropdownItem>Popular</DropdownItem>
-                      <DropdownItem>Most Purchased</DropdownItem>
-                      <DropdownItem>Most Rated</DropdownItem>
+                      <DropdownItem onClick={() => setSortBy('latest')}>Latest</DropdownItem>
+                      <DropdownItem onClick={() => setSortBy('popular')}>Popular</DropdownItem>
+                      <DropdownItem onClick={() => setSortBy('most_purchased')}>Most Purchased</DropdownItem>
+                      <DropdownItem onClick={() => setSortBy('most_rated')}>Most Rated</DropdownItem>
                     </DropdownMenu>
                   </Dropdown>
                   <Dropdown isOpen={dropdownOpen2} toggle={toggle2}>
-                    <DropdownToggle caret>Filter By</DropdownToggle>
+                    <DropdownToggle caret>
+                      {sortBy === 'relevance' ? 'Relevance' :
+                       sortBy === 'name_asc' ? 'Name, A to Z' :
+                       sortBy === 'name_desc' ? 'Name, Z to A' :
+                       sortBy === 'price_asc' ? 'Price, low to high' :
+                       sortBy === 'price_desc' ? 'Price, high to low' : 'Filter By'}
+                    </DropdownToggle>
                     <DropdownMenu>
-                      {/* <DropdownItem header>Header</DropdownItem> */}
-                      <DropdownItem>Relevance</DropdownItem>
-                      <DropdownItem>Name, A to Z</DropdownItem>
-                      <DropdownItem>Name, Z to A</DropdownItem>
+                      <DropdownItem onClick={() => setSortBy('relevance')}>Relevance</DropdownItem>
+                      <DropdownItem onClick={() => setSortBy('name_asc')}>Name, A to Z</DropdownItem>
+                      <DropdownItem onClick={() => setSortBy('name_desc')}>Name, Z to A</DropdownItem>
                       <DropdownItem divider />
-                      <DropdownItem>Price, low to high</DropdownItem>
-                      <DropdownItem>Price, high to low</DropdownItem>
+                      <DropdownItem onClick={() => setSortBy('price_asc')}>Price, low to high</DropdownItem>
+                      <DropdownItem onClick={() => setSortBy('price_desc')}>Price, high to low</DropdownItem>
                     </DropdownMenu>
                   </Dropdown>
                 </div>
