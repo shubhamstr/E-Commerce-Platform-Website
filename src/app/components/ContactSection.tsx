@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Form, Row, Col, FormGroup, Label, Input, Button, Card, CardBody, CardSubtitle, CardText, Container, Spinner, Alert } from 'reactstrap';
 import api from '../../utils/api';
+import branding from '../../branding';
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({
@@ -135,9 +136,9 @@ const ContactSection = () => {
               <CardSubtitle className="mb-2 fw-bold text-dark" tag="h6">
                 🕐 Business Hours
               </CardSubtitle>
-              <CardText className="text-muted small mb-1">Monday – Friday: 9:00 AM – 6:00 PM (PST)</CardText>
-              <CardText className="text-muted small mb-1">Saturday: 10:00 AM – 4:00 PM (PST)</CardText>
-              <CardText className="text-muted small">Sunday: Closed</CardText>
+              <CardText className="text-muted small mb-1">{branding.hours.weekday}</CardText>
+              <CardText className="text-muted small mb-1">{branding.hours.saturday}</CardText>
+              <CardText className="text-muted small">{branding.hours.sunday}</CardText>
             </CardBody>
           </Card>
           <Card className="w-100 mt-3 border-0 shadow-sm">
@@ -146,7 +147,7 @@ const ContactSection = () => {
                 ⚡ Quick Response
               </CardSubtitle>
               <CardText className="text-muted small">
-                We typically respond within 24 hours on business days. For urgent inquiries, call us at <strong>+1 (800) 123-4567</strong>.
+                We typically respond within 24 hours on business days. For urgent inquiries, call us at <strong>{branding.contact.phone}</strong>.
               </CardText>
             </CardBody>
           </Card>
@@ -156,7 +157,7 @@ const ContactSection = () => {
                 📧 Email Us Directly
               </CardSubtitle>
               <CardText className="text-white small" style={{ opacity: 0.9 }}>
-                support@shopnest.com
+                {branding.contact.email}
               </CardText>
             </CardBody>
           </Card>

@@ -28,6 +28,7 @@ import { getWishlist } from "../../services/wishlistService"
 import { setCart, clearCartState } from "../../store/slices/cartSlice"
 import { getCart } from "../../services/cartService"
 import { jwtDecode } from "jwt-decode"
+import branding from "../../branding"
 
 function Header(args: any) {
   const isAuthenticated = useSelector(
@@ -105,7 +106,7 @@ function Header(args: any) {
               router.push("/")
             }}
           >
-            ShopNest
+            {branding.name}
           </NavbarBrand>
           <NavbarToggler onClick={toggle} />
           <Collapse isOpen={isOpen} navbar>

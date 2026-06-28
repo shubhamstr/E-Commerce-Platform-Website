@@ -11,6 +11,7 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping"
 import SupportAgentIcon from "@mui/icons-material/SupportAgent"
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser"
 import styles from "./footer.module.css"
+import branding from "../../branding"
 
 function Footer() {
   return (
@@ -49,10 +50,9 @@ function Footer() {
           <Row xs="1" sm="2" md="4" className="py-5">
             {/* Brand column */}
             <Col className="mb-4">
-              <h2 className={styles.brandName}>ShopNest</h2>
+              <h2 className={styles.brandName}>{branding.name}</h2>
               <p className={styles.brandDesc}>
-                Your one-stop destination for electronics, fashion, home essentials, and more.
-                Quality products at the best prices.
+                {branding.description}
               </p>
             </Col>
 
@@ -83,15 +83,15 @@ function Footer() {
               <h6 className={styles.footerHeading}>Contact Info</h6>
               <div className={styles.contactItem}>
                 <LocationOnIcon className={styles.contactIcon} />
-                <span>San Francisco, CA, USA</span>
+                <span>{branding.contact.address}</span>
               </div>
               <div className={styles.contactItem}>
                 <CallIcon className={styles.contactIcon} />
-                <span>+1 (800) 123-4567</span>
+                <span>{branding.contact.phone}</span>
               </div>
               <div className={styles.contactItem}>
                 <EmailIcon className={styles.contactIcon} />
-                <span>support@shopnest.com</span>
+                <span>{branding.contact.email}</span>
               </div>
             </Col>
           </Row>
@@ -102,11 +102,11 @@ function Footer() {
       <Container fluid className={styles.footerBottom}>
         <Container fluid="sm">
           <div className={styles.footerBottomContent}>
-            <span>© {new Date().getFullYear()} ShopNest. All rights reserved.</span>
+            <span>© {new Date().getFullYear()} {branding.name}. All rights reserved.</span>
             <span>
               Built by{" "}
-              <a href="https://codeguest.in" target="_blank" rel="noopener noreferrer" className={styles.portfolioLink}>
-                Shubham
+              <a href={branding.author.portfolioUrl} target="_blank" rel="noopener noreferrer" className={styles.portfolioLink}>
+                {branding.author.name}
               </a>
             </span>
           </div>
