@@ -189,20 +189,8 @@ const CartList = () => {
         </Col>
       </Row>
       {cartItems.length > 0 && (
-        <Row xs="1" sm="2" className="mb-3">
-          <Col className="d-flex flex-column" xs="12" sm="8" md="9">
-            <h4 className="py-3">Coupon</h4>
-            <p>Enter your coupon code if you have one.</p>
-            <div className="d-flex gap-3">
-              <Input
-                type="text"
-                placeholder="Coupon Code"
-                className={styles.couponInput}
-              />
-              <Button color="danger">Apply Coupon</Button>
-            </div>
-          </Col>
-          <Col className="" xs="12" sm="4" md="3">
+        <Row className="mb-3 justify-content-end">
+          <Col xs="12" sm="6" md="4">
             <h4 className="text-uppercase border-bottom text-end py-3">
               Cart Totals
             </h4>

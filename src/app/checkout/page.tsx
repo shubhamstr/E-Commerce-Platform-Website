@@ -20,7 +20,7 @@ import { useSelector, useDispatch } from "react-redux"
 import { useRouter } from "next/navigation"
 import { RootState } from "../../store"
 import { getUserAddresses, addAddress } from "../../services/authService"
-import { placeOrder } from "../../services/orderService"
+import { placeOrder, validateCoupon } from "../../services/orderService"
 import { clearCartState } from "../../store/slices/cartSlice"
 import { showSuccess, showError } from "../../utils/toast"
 import { formatPrice } from "../../utils/currency"
@@ -40,6 +40,43 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState<string>("cod")
   const [loading, setLoading] = useState<boolean>(false)
   const [showAddAddressForm, setShowAddAddressForm] = useState<boolean>(false)
+
+  // Coupon states
+  const [couponCode, setCouponCode] = useState<string>("")
+  const [couponLoading, setCouponLoading] = useState<boolean>(false)
+  const [couponError, setCouponError] = useState<string>("")
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null)
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError("Please enter a coupon code.")
+      return
+    }
+    setCouponLoading(true)
+    setCouponError("")
+    try {
+      const res = await validateCoupon(couponCode, subtotal)
+      if (res.data && res.data.success) {
+        setAppliedCoupon(res.data.data)
+        showSuccess("Coupon applied successfully!")
+      } else {
+        setCouponError(res.data.message || "Failed to apply coupon.")
+        showError(res.data.message || "Failed to apply coupon.")
+      }
+    } catch (err: any) {
+      const msg = err.response?.data?.message || "Failed to validate coupon."
+      setCouponError(msg)
+      showError(msg)
+    } finally {
+      setCouponLoading(false)
+    }
+  }
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null)
+    setCouponCode("")
+    setCouponError("")
+  }
 
   // New address form state
   const [newAddress, setNewAddress] = useState({
@@ -135,7 +172,7 @@ const CheckoutPage = () => {
     }
     setLoading(true)
     try {
-      const res = await placeOrder(selectedAddressId)
+      const res = await placeOrder(selectedAddressId, appliedCoupon ? appliedCoupon.code : undefined)
       if (res.data && res.data.success) {
         showSuccess("Order placed successfully!")
         dispatch(clearCartState())
@@ -154,8 +191,41 @@ const CheckoutPage = () => {
     (acc, item) => acc + (item.product?.price || 0) * item.quantity,
     0
   )
+
+  // Auto-validate coupon code after user stops typing (500ms debounce)
+  useEffect(() => {
+    if (!couponCode.trim()) {
+      setAppliedCoupon(null)
+      setCouponError("")
+      return
+    }
+
+    const delayDebounceFn = setTimeout(async () => {
+      setCouponLoading(true)
+      setCouponError("")
+      try {
+        const res = await validateCoupon(couponCode, subtotal)
+        if (res.data && res.data.success) {
+          setAppliedCoupon(res.data.data)
+          setCouponError("")
+        } else {
+          setAppliedCoupon(null)
+          setCouponError(res.data.message || "Failed to apply coupon.")
+        }
+      } catch (err: any) {
+        setAppliedCoupon(null)
+        setCouponError(err.response?.data?.message || "Failed to validate coupon.")
+      } finally {
+        setCouponLoading(false)
+      }
+    }, 500)
+
+    return () => clearTimeout(delayDebounceFn)
+  }, [couponCode, subtotal])
+
   const shipping = subtotal > 100 ? 0 : 10
-  const total = subtotal + shipping
+  const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0
+  const total = Math.max(0, subtotal - discountAmount + shipping)
 
   if (!isAuthenticated) {
     return (
@@ -454,6 +524,45 @@ const CheckoutPage = () => {
                     })}
                   </div>
 
+                  {/* Coupon Code Input */}
+                  <div className="py-3 border-bottom">
+                    <h6 className="mb-2">Have a Coupon?</h6>
+                    {appliedCoupon ? (
+                      <div className="d-flex align-items-center justify-content-between bg-light p-2 rounded border border-success">
+                        <div>
+                          <span className="text-success font-weight-bold">
+                            {appliedCoupon.code}
+                          </span>
+                          <div className="small text-muted">
+                            Discount: {appliedCoupon.discountType === 'percentage' ? `${appliedCoupon.discountValue}%` : `₹${appliedCoupon.discountValue}`}
+                          </div>
+                        </div>
+                        <Button color="link" className="text-danger p-0 text-decoration-none" onClick={handleRemoveCoupon}>
+                          Remove
+                        </Button>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="d-flex gap-2 align-items-center">
+                          <Input
+                            type="text"
+                            placeholder="Enter Coupon Code"
+                            value={couponCode}
+                            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                            size="sm"
+                            className="flex-grow-1"
+                          />
+                          {couponLoading && (
+                            <span className="small text-muted style={{ minWidth: '70px' }}">
+                              Checking...
+                            </span>
+                          )}
+                        </div>
+                        {couponError && <div className="text-danger small mt-1">{couponError}</div>}
+                      </div>
+                    )}
+                  </div>
+
                    <div className="d-flex justify-content-between py-2 border-bottom">
                      <span className="text-muted">Subtotal</span>
                      <span>{formatPrice(subtotal)}</span>
@@ -462,6 +571,12 @@ const CheckoutPage = () => {
                      <span className="text-muted">Shipping</span>
                      <span>{shipping === 0 ? "Free" : formatPrice(shipping)}</span>
                    </div>
+                   {discountAmount > 0 && (
+                     <div className="d-flex justify-content-between py-2 border-bottom text-success font-weight-bold">
+                       <span>Discount ({appliedCoupon?.code})</span>
+                       <span>-{formatPrice(discountAmount)}</span>
+                     </div>
+                   )}
                    <div className="d-flex justify-content-between py-3 font-weight-bold h5">
                      <span>Total</span>
                      <span className="text-danger">{formatPrice(total)}</span>

@@ -2,8 +2,11 @@
 // services/orderService.ts
 import api from "../utils/api"
 
-export const placeOrder = (addressId: number) =>
-  api.post("/api/order/checkout", { addressId })
+export const placeOrder = (addressId: number, couponCode?: string) =>
+  api.post("/api/order/checkout", { addressId, couponCode })
+
+export const validateCoupon = (code: string, subTotal: number) =>
+  api.post("/api/coupon/validate", { code, subTotal })
 
 export const getMyOrders = (params?: any) => api.get("/api/order/my", { params })
 

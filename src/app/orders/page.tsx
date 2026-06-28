@@ -360,6 +360,22 @@ const OrdersPage = () => {
                                 )
                               })}
                             </div>
+                            {order.couponCode && (
+                              <div className="bg-light p-3 rounded mt-3 small border border-light">
+                                <div className="d-flex justify-content-between mb-1">
+                                  <span className="text-muted">Subtotal:</span>
+                                  <span className="font-weight-bold text-dark">{formatPrice(order.subTotal || order.totalAmount)}</span>
+                                </div>
+                                <div className="d-flex justify-content-between mb-1">
+                                  <span className="text-muted">Coupon Discount ({order.couponCode}):</span>
+                                  <span className="font-weight-bold text-success">-{formatPrice(order.discountAmount)}</span>
+                                </div>
+                                <div className="d-flex justify-content-between border-top pt-1 font-weight-bold">
+                                  <span>Final Total:</span>
+                                  <span className="text-danger">{formatPrice(order.totalAmount)}</span>
+                                </div>
+                              </div>
+                            )}
                           </Col>
 
                           <Col md="5" className="border-start-md">
