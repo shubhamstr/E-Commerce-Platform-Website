@@ -16,6 +16,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite"
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import { useRouter } from "next/navigation"
+import { formatPrice } from "../../utils/currency"
 
 const ProductCard = ({ index, product, screen }: any) => {
   const dispatch = useDispatch()
@@ -184,7 +185,7 @@ const ProductCard = ({ index, product, screen }: any) => {
       <CardBody>
         <CardTitle tag="h5">{product.name || product.title}</CardTitle>
         <CardSubtitle className="mb-2 text-muted" tag="h6">
-          ${product.price}
+          {formatPrice(product.price)}
         </CardSubtitle>
         {product.description && (
           <div className="mb-2 text-muted" style={{ fontSize: "0.85rem", lineHeight: "1.4" }}>

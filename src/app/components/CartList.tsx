@@ -20,6 +20,7 @@ import { updateQuantityState, removeFromCartState } from "../../store/slices/car
 import { updateCartQuantity, removeFromCart } from "../../services/cartService"
 import { SERVER_URL } from "../../utils/constants"
 import { showSuccess, showError } from "../../utils/toast"
+import { formatPrice } from "../../utils/currency"
 
 const CartList = () => {
   const dispatch = useDispatch()
@@ -118,7 +119,7 @@ const CartList = () => {
                         />
                       </td>
                       <td>{obj.product?.name || "Unknown Product"}</td>
-                      <td>${obj.product?.price}</td>
+                      <td>{formatPrice(obj.product?.price)}</td>
                       <td>
                         <ButtonGroup>
                           <Button
@@ -146,7 +147,7 @@ const CartList = () => {
                         </ButtonGroup>
                       </td>
                       <td>
-                        ${((obj.product?.price || 0) * obj.quantity).toFixed(2)}
+                        {formatPrice((obj.product?.price || 0) * obj.quantity)}
                       </td>
                       <td>
                         <Button
@@ -207,11 +208,11 @@ const CartList = () => {
             </h4>
             <div className="d-flex justify-content-between py-3">
               <p>Subtotal</p>
-              <p>${subtotal.toFixed(2)}</p>
+              <p>{formatPrice(subtotal)}</p>
             </div>
             <div className="d-flex justify-content-between py-3">
               <p>Total</p>
-              <p>${subtotal.toFixed(2)}</p>
+              <p>{formatPrice(subtotal)}</p>
             </div>
             <Button
               color="danger"

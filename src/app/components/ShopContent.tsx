@@ -21,6 +21,7 @@ import styles from './shop.module.css';
 import { getProducts } from '../../services/productService';
 import { getAllCategories } from '../../services/categoryService';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { formatPrice } from '../../utils/currency';
 
 const ShopContent = () => {
   const [productList, setProductList] = useState<any>([]);
@@ -296,7 +297,7 @@ const ShopContent = () => {
                 <div className="">
                   <Slider value={value} step={10} min={0} max={500} onChange={handleChange} valueLabelDisplay="auto" />
                   <p>
-                    ${value[0]} - ${value[1]}
+                    {formatPrice(value[0])} - {formatPrice(value[1])}
                   </p>
                 </div>
                 <CardTitle tag="h6" className="fs-6 fw-medium text-uppercase mb-3 mt-5">

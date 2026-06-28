@@ -7,6 +7,7 @@ import { Container, Row, Col, Card, CardBody, Form, FormGroup, Label, Input, But
 import { trackOrder } from "../../services/orderService"
 import { showError } from "../../utils/toast"
 import BreadcrumbCompo from "../components/BreadcrumbCompo"
+import { formatPrice } from "../../utils/currency"
 import LocalShippingIcon from "@mui/icons-material/LocalShipping"
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
@@ -266,7 +267,7 @@ const TrackOrderContent = () => {
                         <strong>Placed On:</strong> {formatDate(order.createdAt)}
                       </div>
                       <div>
-                        <strong>Payment Status:</strong> Paid (Total: <span className="text-danger font-weight-bold">${parseFloat(order.totalAmount).toFixed(2)}</span>)
+                         <strong>Payment Status:</strong> Paid (Total: <span className="text-danger font-weight-bold">{formatPrice(order.totalAmount)}</span>)
                       </div>
                     </div>
                   </Col>
@@ -301,13 +302,13 @@ const TrackOrderContent = () => {
                         <span className="font-weight-bold text-dark d-block h6 mb-1">
                           {item.product?.name || "Unknown Product"}
                         </span>
-                        <span className="text-muted small">
-                          Qty: {item.quantity} × ${parseFloat(item.price).toFixed(2)}
-                        </span>
+                         <span className="text-muted small">
+                           Qty: {item.quantity} × {formatPrice(item.price)}
+                         </span>
                       </div>
-                      <span className="font-weight-bold text-dark h6">
-                        ${(parseFloat(item.price) * item.quantity).toFixed(2)}
-                      </span>
+                       <span className="font-weight-bold text-dark h6">
+                         {formatPrice(parseFloat(item.price) * item.quantity)}
+                       </span>
                     </div>
                   ))}
                 </div>

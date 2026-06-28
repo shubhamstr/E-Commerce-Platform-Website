@@ -9,6 +9,7 @@ import { RootState } from "../../store"
 import { getMyOrders, cancelOrder, submitReview } from "../../services/orderService"
 import { showError, showSuccess } from "../../utils/toast"
 import BreadcrumbCompo from "../components/BreadcrumbCompo"
+import { formatPrice } from "../../utils/currency"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import ExpandLessIcon from "@mui/icons-material/ExpandLess"
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag"
@@ -276,7 +277,7 @@ const OrdersPage = () => {
                       </div>
                       <div>
                         <span className="text-muted d-block small text-uppercase font-weight-bold">Total Amount</span>
-                        <span className="font-weight-bold text-danger h5">${parseFloat(order.totalAmount).toFixed(2)}</span>
+                         <span className="font-weight-bold text-danger h5">{formatPrice(order.totalAmount)}</span>
                       </div>
                       <div>
                         <span className="text-muted d-block small text-uppercase font-weight-bold mb-1">Status</span>
@@ -316,9 +317,9 @@ const OrdersPage = () => {
                                     <div className="d-flex align-items-center justify-content-between">
                                       <div>
                                         <span className="font-weight-bold text-dark d-block">{item.product?.name || "Unknown Product"}</span>
-                                        <span className="text-muted small">Qty: {item.quantity} × ${parseFloat(item.price).toFixed(2)}</span>
+                                         <span className="text-muted small">Qty: {item.quantity} × {formatPrice(item.price)}</span>
                                       </div>
-                                      <span className="font-weight-bold text-dark">${(parseFloat(item.price) * item.quantity).toFixed(2)}</span>
+                                       <span className="font-weight-bold text-dark">{formatPrice(parseFloat(item.price) * item.quantity)}</span>
                                     </div>
                                     {isDelivered && (
                                       <div className="d-flex align-items-center justify-content-between mt-2 pt-1 border-top border-light">

@@ -19,6 +19,7 @@ import {
   PaginationLink,
 } from "reactstrap"
 import api from "../../../utils/api"
+import { formatPrice } from "../../../utils/currency"
 import ProductCard from "../../components/ProductCard"
 import CallIcon from "@mui/icons-material/Call"
 import MailIcon from "@mui/icons-material/Mail"
@@ -225,7 +226,7 @@ export default function SellerProfilePage() {
           },
           {
             title: "Total Revenue",
-            value: `$${analytics.totalRevenue.toLocaleString()}`,
+            value: formatPrice(analytics.totalRevenue),
             icon: <MonetizationOnIcon className="text-warning" />,
             border: "border-warning",
           },
@@ -315,7 +316,7 @@ export default function SellerProfilePage() {
                             <g key={i}>
                               <circle cx={p.x} cy={p.y} r="5" fill="#0d6efd" stroke="#ffffff" strokeWidth="2" />
                               <text x={p.x} y={p.y - 10} fontSize="10" textAnchor="middle" fontWeight="bold" fill="#212529">
-                                ${p.revenue}
+                                {formatPrice(p.revenue)}
                               </text>
                             </g>
                           ))}

@@ -23,6 +23,7 @@ import { getUserAddresses, addAddress } from "../../services/authService"
 import { placeOrder } from "../../services/orderService"
 import { clearCartState } from "../../store/slices/cartSlice"
 import { showSuccess, showError } from "../../utils/toast"
+import { formatPrice } from "../../utils/currency"
 import { SERVER_URL } from "../../utils/constants"
 import BreadcrumbCompo from "../components/BreadcrumbCompo"
 import Image from "next/image"
@@ -441,30 +442,30 @@ const CheckoutPage = () => {
                             <h6 className="m-0 text-truncate" style={{ maxWidth: "180px" }}>
                               {item.product?.name}
                             </h6>
-                            <span className="small text-muted">
-                              Qty: {item.quantity} × ${item.product?.price}
-                            </span>
+                             <span className="small text-muted">
+                               Qty: {item.quantity} × {formatPrice(item.product?.price)}
+                             </span>
                           </div>
-                          <span className="font-weight-bold">
-                            ${((item.product?.price || 0) * item.quantity).toFixed(2)}
-                          </span>
+                           <span className="font-weight-bold">
+                             {formatPrice((item.product?.price || 0) * item.quantity)}
+                           </span>
                         </div>
                       )
                     })}
                   </div>
 
-                  <div className="d-flex justify-content-between py-2 border-bottom">
-                    <span className="text-muted">Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="d-flex justify-content-between py-2 border-bottom">
-                    <span className="text-muted">Shipping</span>
-                    <span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
-                  </div>
-                  <div className="d-flex justify-content-between py-3 font-weight-bold h5">
-                    <span>Total</span>
-                    <span className="text-danger">${total.toFixed(2)}</span>
-                  </div>
+                   <div className="d-flex justify-content-between py-2 border-bottom">
+                     <span className="text-muted">Subtotal</span>
+                     <span>{formatPrice(subtotal)}</span>
+                   </div>
+                   <div className="d-flex justify-content-between py-2 border-bottom">
+                     <span className="text-muted">Shipping</span>
+                     <span>{shipping === 0 ? "Free" : formatPrice(shipping)}</span>
+                   </div>
+                   <div className="d-flex justify-content-between py-3 font-weight-bold h5">
+                     <span>Total</span>
+                     <span className="text-danger">{formatPrice(total)}</span>
+                   </div>
 
                   <Button
                     color="danger"
