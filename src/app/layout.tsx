@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "ShopNest — Your One-Stop Online Store",
-  description: "Discover amazing deals on electronics, fashion, home essentials and more at ShopNest. Fast delivery, secure checkout, and the best prices.",
+  title: "Guestora — Your One-Stop Online Store",
+  description: "Discover amazing deals on electronics, fashion, home essentials and more at Guestora. Fast delivery, secure checkout, and the best prices.",
 }
 
 export default function RootLayout({

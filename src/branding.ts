@@ -4,7 +4,7 @@
 
 const branding = {
   // App name
-  name: 'ShopNest',
+  name: 'Guestora',
   // Tagline
   tagline: 'Your One-Stop Online Store',
   // Full title for metadata
@@ -13,7 +13,7 @@ const branding = {
   },
   // Meta description
   description:
-    'Discover amazing deals on electronics, fashion, home essentials and more at ShopNest. Fast delivery, secure checkout, and the best prices.',
+    'Discover amazing deals on electronics, fashion, home essentials and more at Guestora. Fast delivery, secure checkout, and the best prices.',
 
   // Developer / author
   author: {
@@ -29,7 +29,7 @@ const branding = {
 
   // Contact info
   contact: {
-    email: 'support@shopnest.com',
+    email: 'support@guestora.com',
     phone: '+1 (800) 123-4567',
     address: 'San Francisco, CA, USA',
   },
