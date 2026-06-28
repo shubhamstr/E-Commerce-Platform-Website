@@ -105,7 +105,7 @@ function Header(args: any) {
               router.push("/")
             }}
           >
-            Guest Market
+            ShopNest
           </NavbarBrand>
           <NavbarToggler onClick={toggle} />
           <Collapse isOpen={isOpen} navbar>

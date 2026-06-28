@@ -120,28 +120,44 @@ const ContactSection = () => {
           </Form>
         </Col>
         <Col xs="12" sm="6" md="5">
-          <Card className="w-100">
+          <Card className="w-100 border-0 shadow-sm">
             <CardBody>
-              <CardSubtitle className="mb-2 text-muted" tag="h6">
-                New York
+              <CardSubtitle className="mb-2 fw-bold text-dark" tag="h6">
+                🎧 Customer Support
               </CardSubtitle>
-              <CardText>203 Fake St. Mountain View, San Francisco, California, USA</CardText>
+              <CardText className="text-muted small">
+                Our support team is here to help with orders, returns, product questions, and more. Reach out anytime!
+              </CardText>
             </CardBody>
           </Card>
-          <Card className="w-100 mt-3">
+          <Card className="w-100 mt-3 border-0 shadow-sm">
             <CardBody>
-              <CardSubtitle className="mb-2 text-muted" tag="h6">
-                London
+              <CardSubtitle className="mb-2 fw-bold text-dark" tag="h6">
+                🕐 Business Hours
               </CardSubtitle>
-              <CardText>203 Fake St. Mountain View, San Francisco, California, USA</CardText>
+              <CardText className="text-muted small mb-1">Monday – Friday: 9:00 AM – 6:00 PM (PST)</CardText>
+              <CardText className="text-muted small mb-1">Saturday: 10:00 AM – 4:00 PM (PST)</CardText>
+              <CardText className="text-muted small">Sunday: Closed</CardText>
             </CardBody>
           </Card>
-          <Card className="w-100 mt-3">
+          <Card className="w-100 mt-3 border-0 shadow-sm">
             <CardBody>
-              <CardSubtitle className="mb-2 text-muted" tag="h6">
-                Canada
+              <CardSubtitle className="mb-2 fw-bold text-dark" tag="h6">
+                ⚡ Quick Response
               </CardSubtitle>
-              <CardText>203 Fake St. Mountain View, San Francisco, California, USA</CardText>
+              <CardText className="text-muted small">
+                We typically respond within 24 hours on business days. For urgent inquiries, call us at <strong>+1 (800) 123-4567</strong>.
+              </CardText>
+            </CardBody>
+          </Card>
+          <Card className="w-100 mt-3 border-0 shadow-sm" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+            <CardBody>
+              <CardSubtitle className="mb-2 fw-bold text-white" tag="h6">
+                📧 Email Us Directly
+              </CardSubtitle>
+              <CardText className="text-white small" style={{ opacity: 0.9 }}>
+                support@shopnest.com
+              </CardText>
             </CardBody>
           </Card>
         </Col>
