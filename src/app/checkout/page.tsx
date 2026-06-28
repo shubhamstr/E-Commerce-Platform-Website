@@ -23,7 +23,7 @@ import { getUserAddresses, addAddress } from "../../services/authService"
 import { placeOrder, validateCoupon } from "../../services/orderService"
 import { clearCartState } from "../../store/slices/cartSlice"
 import { showSuccess, showError } from "../../utils/toast"
-import { formatPrice } from "../../utils/currency"
+import { formatPrice, CURRENCY_SYMBOL } from "../../utils/currency"
 import { SERVER_URL } from "../../utils/constants"
 import BreadcrumbCompo from "../components/BreadcrumbCompo"
 import Image from "next/image"
@@ -534,7 +534,7 @@ const CheckoutPage = () => {
                             {appliedCoupon.code}
                           </span>
                           <div className="small text-muted">
-                            Discount: {appliedCoupon.discountType === 'percentage' ? `${appliedCoupon.discountValue}%` : `₹${appliedCoupon.discountValue}`}
+                            Discount: {appliedCoupon.discountType === 'percentage' ? `${appliedCoupon.discountValue}%` : `${CURRENCY_SYMBOL}${appliedCoupon.discountValue}`}
                           </div>
                         </div>
                         <Button color="link" className="text-danger p-0 text-decoration-none" onClick={handleRemoveCoupon}>
@@ -549,7 +549,7 @@ const CheckoutPage = () => {
                             placeholder="Enter Coupon Code"
                             value={couponCode}
                             onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                            size="sm"
+                            bsSize="sm"
                             className="flex-grow-1"
                           />
                           {couponLoading && (
