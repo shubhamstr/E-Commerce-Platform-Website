@@ -9,6 +9,9 @@ export const loginUser = (data: any) => api.post("/api/user/login", data)
 export const getUser = (id: any) => api.get(`/api/user/get/${id}`)
 export const updateUser = (id: any, data: any) => api.post(`/api/user/update/${id}`, data)
 export const updatePassword = (id: any, data: any) => api.post(`/api/user/update-password/${id}`, data)
+export const forgotPassword = (data: any) => api.post("/api/user/forgot-password", data)
+export const resetPassword = (data: any) => api.post("/api/user/reset-password", data)
+
 
 // addresses
 export const getUserAddresses = (id: any) => api.get(`/api/address/get/user/${id}`)

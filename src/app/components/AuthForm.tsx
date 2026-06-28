@@ -17,6 +17,8 @@ import { login, setUserData } from "../../store/slices/authSlice"
 import { registerUser, loginUser } from "../../services/authService";
 import { showSuccess, showError } from '../../utils/toast';
 import { useRouter } from "next/navigation"
+import Link from "next/link"
+
 
 const AuthForm = ({ type }: any) => {
   const router = useRouter()
@@ -218,7 +220,13 @@ const AuthForm = ({ type }: any) => {
                 >
                   Login
                 </Button>
+                <div className="mt-3">
+                  <Link href="/forgot-password" style={{ fontSize: "14px", textDecoration: "none" }}>
+                    Forgot Password?
+                  </Link>
+                </div>
               </FormGroup>
+
             </Form>
           )}
         </Col>
