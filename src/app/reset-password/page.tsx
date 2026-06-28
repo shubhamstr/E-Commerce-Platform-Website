@@ -6,6 +6,9 @@ import BreadcrumbCompo from '../components/BreadcrumbCompo';
 import { resetPassword } from '../../services/authService';
 import { showSuccess, showError } from '../../utils/toast';
 
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+
 const ResetPasswordForm = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -16,6 +19,8 @@ const ResetPasswordForm = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,27 +73,71 @@ const ResetPasswordForm = () => {
       <Form onSubmit={handleSubmit}>
         <FormGroup>
           <Label for="password">New Password</Label>
-          <Input
-            id="password"
-            value={password}
-            name="password"
-            placeholder="Enter new password"
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <div className="position-relative">
+            <Input
+              id="password"
+              value={password}
+              name="password"
+              placeholder="Enter new password"
+              type={showPassword ? "text" : "password"}
+              style={{ paddingRight: "40px" }}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: "absolute",
+                right: "10px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+                color: "#6c757d",
+                display: "flex",
+                alignItems: "center"
+              }}
+            >
+              {showPassword ? <VisibilityOffIcon style={{ fontSize: "20px" }} /> : <VisibilityIcon style={{ fontSize: "20px" }} />}
+            </button>
+          </div>
         </FormGroup>
         <FormGroup>
           <Label for="confirmPassword">Confirm Password</Label>
-          <Input
-            id="confirmPassword"
-            value={confirmPassword}
-            name="confirmPassword"
-            placeholder="Confirm new password"
-            type="password"
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
+          <div className="position-relative">
+            <Input
+              id="confirmPassword"
+              value={confirmPassword}
+              name="confirmPassword"
+              placeholder="Confirm new password"
+              type={showConfirmPassword ? "text" : "password"}
+              style={{ paddingRight: "40px" }}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              style={{
+                position: "absolute",
+                right: "10px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+                color: "#6c757d",
+                display: "flex",
+                alignItems: "center"
+              }}
+            >
+              {showConfirmPassword ? <VisibilityOffIcon style={{ fontSize: "20px" }} /> : <VisibilityIcon style={{ fontSize: "20px" }} />}
+            </button>
+          </div>
         </FormGroup>
         <FormGroup className="text-center mt-4">
           <Button color="primary" type="submit" disabled={loading} className="w-100">

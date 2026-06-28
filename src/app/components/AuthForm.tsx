@@ -18,6 +18,9 @@ import { registerUser, loginUser } from "../../services/authService";
 import { showSuccess, showError } from '../../utils/toast';
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import VisibilityIcon from "@mui/icons-material/Visibility"
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff"
+
 
 
 const AuthForm = ({ type }: any) => {
@@ -32,6 +35,8 @@ const AuthForm = ({ type }: any) => {
     email: "",
     password: "",
   })
+  const [showPassword, setShowPassword] = useState(false)
+
 
   const resetForm = () => {
     setUserDetails({
@@ -149,20 +154,43 @@ const AuthForm = ({ type }: any) => {
               </FormGroup>
               <FormGroup>
                 <Label for="password">Password</Label>
-                <Input
-                  id="password"
-                  value={userDetails.password}
-                  name="password"
-                  placeholder="1 Special Char, 1 Number, 1 Uppercase"
-                  type="password"
-                  onChange={(e) => {
-                    setUserDetails((prev) => ({
-                      ...prev,
-                      [e.target.name]: e.target.value,
-                    }))
-                  }}
-                />
+                <div className="position-relative">
+                  <Input
+                    id="password"
+                    value={userDetails.password}
+                    name="password"
+                    placeholder="1 Special Char, 1 Number, 1 Uppercase"
+                    type={showPassword ? "text" : "password"}
+                    style={{ paddingRight: "40px" }}
+                    onChange={(e) => {
+                      setUserDetails((prev) => ({
+                        ...prev,
+                        [e.target.name]: e.target.value,
+                      }))
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: "absolute",
+                      right: "10px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      cursor: "pointer",
+                      color: "#6c757d",
+                      display: "flex",
+                      alignItems: "center"
+                    }}
+                  >
+                    {showPassword ? <VisibilityOffIcon style={{ fontSize: "20px" }} /> : <VisibilityIcon style={{ fontSize: "20px" }} />}
+                  </button>
+                </div>
               </FormGroup>
+
               <FormGroup className="text-center">
                 <Button
                   color="primary"
@@ -196,20 +224,43 @@ const AuthForm = ({ type }: any) => {
               </FormGroup>
               <FormGroup>
                 <Label for="password">Password</Label>
-                <Input
-                  id="password"
-                  value={userDetails.password}
-                  name="password"
-                  placeholder="1 Special Char, 1 Number, 1 Uppercase"
-                  type="password"
-                  onChange={(e) => {
-                    setUserDetails((prev) => ({
-                      ...prev,
-                      [e.target.name]: e.target.value,
-                    }))
-                  }}
-                />
+                <div className="position-relative">
+                  <Input
+                    id="password"
+                    value={userDetails.password}
+                    name="password"
+                    placeholder="1 Special Char, 1 Number, 1 Uppercase"
+                    type={showPassword ? "text" : "password"}
+                    style={{ paddingRight: "40px" }}
+                    onChange={(e) => {
+                      setUserDetails((prev) => ({
+                        ...prev,
+                        [e.target.name]: e.target.value,
+                      }))
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: "absolute",
+                      right: "10px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      cursor: "pointer",
+                      color: "#6c757d",
+                      display: "flex",
+                      alignItems: "center"
+                    }}
+                  >
+                    {showPassword ? <VisibilityOffIcon style={{ fontSize: "20px" }} /> : <VisibilityIcon style={{ fontSize: "20px" }} />}
+                  </button>
+                </div>
               </FormGroup>
+
               <FormGroup className="text-center">
                 <Button
                   color="primary"
