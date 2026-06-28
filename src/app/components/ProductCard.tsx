@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
-import React from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { Card, CardBody, CardTitle, CardSubtitle, Button } from "reactstrap"
 import Image from "next/image"
 import styles from "./product.module.css"
@@ -22,6 +22,15 @@ const ProductCard = ({ index, product, screen }: any) => {
   const router = useRouter()
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated)
   const wishlistItems = useSelector((state: RootState) => state.wishlist.items)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [isOverflowing, setIsOverflowing] = useState(false)
+  const textRef = useRef<HTMLParagraphElement>(null)
+
+  useEffect(() => {
+    if (textRef.current) {
+      setIsOverflowing(textRef.current.scrollHeight > textRef.current.clientHeight)
+    }
+  }, [product.description])
   
   const isWishlisted = wishlistItems.some((item: any) => item.productId === product.id)
 
@@ -177,7 +186,41 @@ const ProductCard = ({ index, product, screen }: any) => {
         <CardSubtitle className="mb-2 text-muted" tag="h6">
           ${product.price}
         </CardSubtitle>
-        {/* <CardText>Some quick example text to build on the card title and make up the bulk of the card‘s content.</CardText> */}
+        {product.description && (
+          <div className="mb-2 text-muted" style={{ fontSize: "0.85rem", lineHeight: "1.4" }}>
+            <p
+              ref={textRef}
+              style={{
+                display: "-webkit-box",
+                WebkitLineClamp: isExpanded ? "unset" : 3,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+                margin: 0,
+              }}
+            >
+              {product.description}
+            </p>
+            {isOverflowing && (
+              <span
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setIsExpanded(!isExpanded)
+                }}
+                style={{
+                  color: "#0d6efd",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  display: "inline-block",
+                  marginTop: "4px",
+                  fontSize: "0.8rem"
+                }}
+              >
+                {isExpanded ? "Show Less" : "Show More"}
+              </span>
+            )}
+          </div>
+        )}
         <div className="d-flex gap-2">
           <Button color="primary" size="sm" outline onClick={handleAddToCart}>
             Add to Cart
