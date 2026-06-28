@@ -26,6 +26,10 @@ const OrdersPage = () => {
   const [loading, setLoading] = useState(true)
   const [openOrders, setOpenOrders] = useState<{ [key: number]: boolean }>({})
   const [cancellingId, setCancellingId] = useState<number | null>(null)
+  const [page, setPage] = useState<number>(1)
+  const [hasMore, setHasMore] = useState<boolean>(true)
+  const [loadingMore, setLoadingMore] = useState<boolean>(false)
+  const observerRef = React.useRef<HTMLDivElement | null>(null)
 
   // Review Modal State
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
@@ -69,7 +73,8 @@ const OrdersPage = () => {
       if (res.data.success) {
         showSuccess(res.data.message || "Review submitted successfully.")
         setIsReviewModalOpen(false)
-        fetchOrders()
+        setPage(1)
+        fetchOrders(1, true)
       } else {
         showError(res.data.message || "Failed to submit review.")
       }
@@ -81,12 +86,25 @@ const OrdersPage = () => {
     }
   }
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (pageNum = 1, shouldReset = false) => {
+    if (pageNum === 1 || shouldReset) {
+      setLoading(true)
+    } else {
+      setLoadingMore(true)
+    }
     try {
-      const res = await getMyOrders()
+      const res = await getMyOrders({ page: pageNum, limit: 5 })
       const { success, data, message } = res.data
       if (success) {
-        setOrders(data || [])
+        const records = data.records || []
+        const total = data.total || 0
+        if (pageNum === 1 || shouldReset) {
+          setOrders(records)
+          setHasMore(records.length < total)
+        } else {
+          setOrders((prev) => [...prev, ...records])
+          setHasMore((prevOrders: any) => (prevOrders.length + records.length) < total)
+        }
       } else {
         showError(message || "Failed to load orders")
       }
@@ -95,6 +113,7 @@ const OrdersPage = () => {
       showError("Failed to load orders. Please try again.")
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
   }
 
@@ -107,9 +126,42 @@ const OrdersPage = () => {
       }
     }
     if (isAuthenticated) {
-      fetchOrders()
+      setPage(1)
+      setHasMore(true)
+      fetchOrders(1, true)
     }
   }, [isAuthenticated])
+
+  useEffect(() => {
+    if (isAuthenticated && page > 1) {
+      fetchOrders(page)
+    }
+  }, [page])
+
+  // Scroll observer logic
+  useEffect(() => {
+    if (!hasMore || loadingMore || loading) return
+
+    const currentRef = observerRef.current
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setPage((prevPage) => prevPage + 1)
+        }
+      },
+      { threshold: 0.1 }
+    )
+
+    if (currentRef) {
+      observer.observe(currentRef)
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef)
+      }
+    }
+  }, [hasMore, loadingMore, loading])
 
   const toggleOrder = (orderId: number) => {
     setOpenOrders((prev) => ({
@@ -128,7 +180,8 @@ const OrdersPage = () => {
       const { success, message } = res.data
       if (success) {
         showSuccess(message || "Order cancelled successfully.")
-        fetchOrders()
+        setPage(1)
+        fetchOrders(1, true)
       } else {
         showError(message || "Failed to cancel order.")
       }
@@ -350,11 +403,11 @@ const OrdersPage = () => {
                                             ))}
                                           </span>
                                           {orderReview.comment && (
-                                            <div className="text-muted small italic w-100">"{orderReview.comment}"</div>
+                                            <div className="text-muted small italic w-100">&ldquo;{orderReview.comment}&rdquo;</div>
                                           )}
                                         </div>
                                       ) : (
-                                        <span className="text-muted small italic">You haven't rated this order experience yet.</span>
+                                        <span className="text-muted small italic">You haven&apos;t rated this order experience yet.</span>
                                       )}
                                       <Button
                                         color="primary"
@@ -377,6 +430,16 @@ const OrdersPage = () => {
                   </Card>
                 )
               })}
+              <div ref={observerRef} className="text-center py-4 mt-3">
+                {loadingMore && (
+                  <div className="spinner-border text-danger" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                )}
+                {!hasMore && orders.length > 0 && (
+                  <p className="text-muted small">No more orders to show.</p>
+                )}
+              </div>
             </div>
           )}
         </Col>

@@ -13,9 +13,6 @@ import {
   DropdownToggle,
   Input,
   Label,
-  Pagination,
-  PaginationItem,
-  PaginationLink,
   Row
 } from 'reactstrap';
 import ProductCard from './ProductCard';
@@ -32,9 +29,13 @@ const ShopContent = () => {
   const [dropdownOpen2, setDropdownOpen2] = useState(false);
   const [value, setValue] = React.useState<number[]>([0, 500]);
   const [debouncedValue, setDebouncedValue] = useState<number[]>([0, 500]);
+  const [page, setPage] = useState<number>(1);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>('latest');
+  const observerRef = React.useRef<HTMLDivElement | null>(null);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -75,8 +76,9 @@ const ShopContent = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoadingMore(true);
       try {
-        const params: any = { page: 1, limit: 12 };
+        const params: any = { page, limit: 12 };
         const filtersObj: any = {};
         if (categoryId) {
           filtersObj.categoryId = { value: categoryId };
@@ -126,14 +128,60 @@ const ShopContent = () => {
 
         const res = await getProducts({ params });
         if (res.data && res.data.success) {
-          setProductList(res.data.data.records || []);
+          const records = res.data.data.records || [];
+          const total = res.data.data.total || 0;
+
+          if (page === 1) {
+            setProductList(records);
+          } else {
+            setProductList((prev: any) => [...prev, ...records]);
+          }
+
+          if (records.length < 12 || (page * 12) >= total) {
+            setHasMore(false);
+          } else {
+            setHasMore(true);
+          }
         }
       } catch (error) {
         console.error("Error fetching products in ShopContent:", error);
+      } finally {
+        setLoadingMore(false);
       }
     };
     fetchProducts();
+  }, [categoryId, selectedSize, selectedColor, debouncedValue, sortBy, page]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+    setHasMore(true);
   }, [categoryId, selectedSize, selectedColor, debouncedValue, sortBy]);
+
+  // Scroll observer logic
+  useEffect(() => {
+    if (!hasMore || loadingMore) return;
+
+    const currentRef = observerRef.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setPage((prevPage) => prevPage + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [hasMore, loadingMore]);
 
   return (
     <Container fluid="sm">
@@ -186,36 +234,15 @@ const ShopContent = () => {
               </div>
             </Col>
             <Col xs="12" sm="12" md="12">
-              <div className="d-flex justify-content-center mt-5">
-                <Pagination size="">
-                  <PaginationItem>
-                    <PaginationLink first href="#" />
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#" previous />
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#">1</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#">2</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#">3</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#">4</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#">5</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#" next />
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#" last />
-                  </PaginationItem>
-                </Pagination>
+              <div ref={observerRef} className="text-center py-4 mt-3">
+                {loadingMore && (
+                  <div className="spinner-border text-danger" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                )}
+                {!hasMore && productList.length > 0 && (
+                  <p className="text-muted small">No more products to show.</p>
+                )}
               </div>
             </Col>
           </Row>

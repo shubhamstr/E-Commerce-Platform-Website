@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // services/orderService.ts
 import api from "../utils/api"
 
 export const placeOrder = (addressId: number) =>
   api.post("/api/order/checkout", { addressId })
 
-export const getMyOrders = () => api.get("/api/order/my")
+export const getMyOrders = (params?: any) => api.get("/api/order/my", { params })
 
 export const cancelOrder = (orderId: number) => api.put(`/api/order/${orderId}/cancel`)
 
