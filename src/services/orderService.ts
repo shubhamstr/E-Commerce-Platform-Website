@@ -11,3 +11,6 @@ export const cancelOrder = (orderId: number) => api.put(`/api/order/${orderId}/c
 export const submitReview = (reviewData: { orderId: number; productId: number | null; rating: number; comment?: string }) =>
   api.post("/api/review", reviewData)
 
+export const trackOrder = (orderId: string | number) =>
+  api.get(`/api/order/track?orderId=${orderId}`)
+
