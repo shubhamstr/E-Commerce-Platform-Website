@@ -11,10 +11,6 @@ jobs:
     name: Build & Push to ECR
     runs-on: ubuntu-latest
 
-    outputs:
-      registry: ${{ steps.set-registry.outputs.registry }}
-      image_tag: ${{ steps.set-registry.outputs.image_tag }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,26 +22,15 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Construct ECR Registry URL
-        id: set-registry
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-          echo "registry=${ECR_REGISTRY}"  >> "$GITHUB_OUTPUT"
-          echo "image_tag=${IMAGE_TAG}"    >> "$GITHUB_OUTPUT"
-          echo "✅ ECR_REGISTRY=${ECR_REGISTRY}"
-
       - name: Login to Amazon ECR
+        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build, tag & push image to ECR
         env:
-          ECR_REGISTRY: ${{ steps.set-registry.outputs.registry }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-          IMAGE_TAG: ${{ steps.set-registry.outputs.image_tag }}
+          IMAGE_TAG: ${{ github.sha }}
           NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL }}
         run: |
           IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
@@ -73,28 +58,37 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Prepare ECR credentials
+        id: prep
+        run: |
+          ECR_PASS=$(aws ecr get-login-password --region ${{ secrets.AWS_REGION }})
+          echo "::add-mask::$ECR_PASS"
+          echo "ecr_password=$ECR_PASS" >> "$GITHUB_OUTPUT"
+
       - name: Deploy container on EC2
         uses: appleboy/ssh-action@v1.0.3
         env:
-          ECR_REGISTRY: ${{ needs.build-and-push.outputs.registry }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-          IMAGE_TAG: ${{ needs.build-and-push.outputs.image_tag }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+          IMAGE_TAG: ${{ github.sha }}
+          ECR_PASSWORD: ${{ steps.prep.outputs.ecr_password }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,AWS_REGION
+          envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,ECR_PASSWORD
           script: |
             set -e
 
             FULL_IMAGE="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
             echo "▶ Deploying: ${FULL_IMAGE}"
 
-            # 1. Login to ECR — fetch credentials on the EC2 instance itself
-            #    (requires EC2 IAM role with ecr:GetAuthorizationToken permission)
-            aws ecr get-login-password --region "${AWS_REGION}" \
-              | docker login --username AWS --password-stdin "${ECR_REGISTRY}"
+            # 1. Login to ECR
+            echo "$ECR_PASSWORD" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
 
             # 2. Pull new image
             docker pull "${FULL_IMAGE}"
