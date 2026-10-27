@@ -73,38 +73,28 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Get ECR login password
-        id: prep
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          ECR_REGISTRY: ${{ needs.build-and-push.outputs.registry }}
-        run: |
-          echo "✅ ECR_REGISTRY=${ECR_REGISTRY}"
-
-          ECR_PASS=$(aws ecr get-login-password --region "${AWS_REGION}")
-          echo "::add-mask::${ECR_PASS}"
-          echo "ecr_password=${ECR_PASS}" >> "$GITHUB_OUTPUT"
-
       - name: Deploy container on EC2
         uses: appleboy/ssh-action@v1.0.3
         env:
           ECR_REGISTRY: ${{ needs.build-and-push.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ needs.build-and-push.outputs.image_tag }}
-          ECR_PASSWORD: ${{ steps.prep.outputs.ecr_password }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,ECR_PASSWORD
+          envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,AWS_REGION
           script: |
             set -e
 
             FULL_IMAGE="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
             echo "▶ Deploying: ${FULL_IMAGE}"
 
-            # 1. Login to ECR
-            echo "${ECR_PASSWORD}" | docker login --username AWS --password-stdin "${ECR_REGISTRY}"
+            # 1. Login to ECR — fetch credentials on the EC2 instance itself
+            #    (requires EC2 IAM role with ecr:GetAuthorizationToken permission)
+            aws ecr get-login-password --region "${AWS_REGION}" \
+              | docker login --username AWS --password-stdin "${ECR_REGISTRY}"
 
             # 2. Pull new image
             docker pull "${FULL_IMAGE}"
