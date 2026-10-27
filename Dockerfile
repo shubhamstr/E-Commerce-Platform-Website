@@ -5,7 +5,9 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-ENV NEXT_PUBLIC_SERVER_URL=__NEXT_PUBLIC_SERVER_URL__
+# Accept the public URL at build time (required — Next.js inlines NEXT_PUBLIC_ vars at compile time)
+ARG NEXT_PUBLIC_SERVER_URL
+ENV NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL
 RUN npm run build
 
 FROM node:20-alpine AS runner

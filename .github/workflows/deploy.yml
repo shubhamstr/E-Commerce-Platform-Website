@@ -40,10 +40,13 @@ jobs:
       - name: Build, tag & push image to ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL }}
         run: |
           IMAGE_URI="$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}"
 
-          docker build -t "$IMAGE_URI" .
+          docker build \
+            --build-arg NEXT_PUBLIC_SERVER_URL="$NEXT_PUBLIC_SERVER_URL" \
+            -t "$IMAGE_URI" .
           docker push "$IMAGE_URI"
 
           docker tag  "$IMAGE_URI" "$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest"
@@ -61,6 +64,15 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Validate ECR registry output
+        run: |
+          ECR_REGISTRY="${{ needs.build-and-push.outputs.registry }}"
+          if [ -z "$ECR_REGISTRY" ]; then
+            echo "❌ ECR_REGISTRY is empty — build-and-push job did not export registry output."
+            exit 1
+          fi
+          echo "✅ ECR_REGISTRY=$ECR_REGISTRY"
 
       - name: Prepare Runtime Secrets
         id: prep
@@ -83,15 +95,22 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           ECR_PASSWORD: ${{ steps.prep.outputs.ecr_password }}
           ENV_B64: ${{ steps.prep.outputs.env_b64 }}
-          NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,ECR_PASSWORD,ENV_B64,NEXT_PUBLIC_SERVER_URL
+          envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,ECR_PASSWORD,ENV_B64
           script: |
             set -e
+
+            # Guard: fail fast if registry is missing to avoid Docker Hub fallback
+            if [ -z "$ECR_REGISTRY" ]; then
+              echo "❌ ECR_REGISTRY is empty — aborting to prevent Docker Hub auth error."
+              exit 1
+            fi
+
             FULL_IMAGE="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+            echo "▶ Deploying image: $FULL_IMAGE"
 
             # 1. Create .env at runtime on EC2
             if [ -n "$ENV_B64" ]; then
@@ -116,3 +135,5 @@ jobs:
 
             # 4. Clean dangling images
             docker image prune -f
+
+            echo "✅ Deployment complete: $FULL_IMAGE"
