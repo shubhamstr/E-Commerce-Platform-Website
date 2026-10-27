@@ -1,11 +1,11 @@
 "use client"
-import React, { useEffect, useState } from "react"
+import React, { Suspense, useEffect, useState } from "react"
 import { Container, Row, Col, Card, CardBody, Button } from "reactstrap"
 import { useRouter, useSearchParams } from "next/navigation"
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag"
 
-const CheckoutSuccessPage = () => {
+const CheckoutSuccessContent = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [orderId, setOrderId] = useState<string | null>(null)
@@ -68,6 +68,14 @@ const CheckoutSuccessPage = () => {
         </Col>
       </Row>
     </Container>
+  )
+}
+
+const CheckoutSuccessPage = () => {
+  return (
+    <Suspense fallback={<div className="py-5 text-center">Loading...</div>}>
+      <CheckoutSuccessContent />
+    </Suspense>
   )
 }
 
