@@ -79,7 +79,7 @@ jobs:
             docker run -d \
               --name ecommerce-app \
               --restart unless-stopped \
-              -p 80:3000 \
+              -p 4005:4005 \
               -e NODE_ENV=production \
               -e NEXT_PUBLIC_SERVER_URL="${{ secrets.NEXT_PUBLIC_SERVER_URL }}" \
               "$IMAGE_URI"
