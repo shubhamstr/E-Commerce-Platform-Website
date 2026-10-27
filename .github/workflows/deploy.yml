@@ -6,19 +6,14 @@ on:
   #     - main
   workflow_dispatch:
 
-env:
-  AWS_REGION: ${{ secrets.AWS_REGION }}
-  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-  IMAGE_TAG: ${{ github.sha }}
-
 jobs:
   build-and-push:
     name: Build & Push to ECR
     runs-on: ubuntu-latest
 
     outputs:
-      # Explicitly constructed — more reliable than action output across jobs
       registry: ${{ steps.set-registry.outputs.registry }}
+      image_tag: ${{ steps.set-registry.outputs.image_tag }}
 
     steps:
       - name: Checkout code
@@ -29,34 +24,41 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Construct ECR Registry URL
         id: set-registry
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com"
-          echo "registry=$ECR_REGISTRY" >> "$GITHUB_OUTPUT"
-          echo "✅ ECR_REGISTRY=$ECR_REGISTRY"
+          ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+          echo "registry=${ECR_REGISTRY}"  >> "$GITHUB_OUTPUT"
+          echo "image_tag=${IMAGE_TAG}"    >> "$GITHUB_OUTPUT"
+          echo "✅ ECR_REGISTRY=${ECR_REGISTRY}"
 
       - name: Login to Amazon ECR
-        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build, tag & push image to ECR
         env:
           ECR_REGISTRY: ${{ steps.set-registry.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ steps.set-registry.outputs.image_tag }}
           NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL }}
         run: |
-          IMAGE_URI="$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}"
+          IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
 
           docker build \
-            --build-arg NEXT_PUBLIC_SERVER_URL="$NEXT_PUBLIC_SERVER_URL" \
-            -t "$IMAGE_URI" .
-          docker push "$IMAGE_URI"
+            --build-arg NEXT_PUBLIC_SERVER_URL="${NEXT_PUBLIC_SERVER_URL}" \
+            -t "${IMAGE_URI}" .
+          docker push "${IMAGE_URI}"
 
-          docker tag  "$IMAGE_URI" "$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest"
-          docker push "$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest"
+          docker tag  "${IMAGE_URI}" "${ECR_REGISTRY}/${ECR_REPOSITORY}:latest"
+          docker push "${ECR_REGISTRY}/${ECR_REPOSITORY}:latest"
+
+          echo "✅ Pushed: ${IMAGE_URI}"
 
   deploy:
     name: Deploy to EC2
@@ -64,36 +66,31 @@ jobs:
     needs: build-and-push
 
     steps:
-      - name: Configure AWS Credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Prepare Runtime Secrets
+      - name: Get ECR login password
         id: prep
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           ECR_REGISTRY: ${{ needs.build-and-push.outputs.registry }}
         run: |
-          # Validate registry was passed correctly
-          if [ -z "$ECR_REGISTRY" ]; then
-            echo "❌ ECR_REGISTRY is empty — registry output was not passed from build-and-push job."
-            exit 1
-          fi
-          echo "✅ ECR_REGISTRY=$ECR_REGISTRY"
+          echo "✅ ECR_REGISTRY=${ECR_REGISTRY}"
 
-          ECR_PASS=$(aws ecr get-login-password --region "$AWS_REGION")
-          echo "::add-mask::$ECR_PASS"
-          echo "ecr_password=$ECR_PASS" >> "$GITHUB_OUTPUT"
+          ECR_PASS=$(aws ecr get-login-password --region "${AWS_REGION}")
+          echo "::add-mask::${ECR_PASS}"
+          echo "ecr_password=${ECR_PASS}" >> "$GITHUB_OUTPUT"
 
-      - name: Run Container on EC2
+      - name: Deploy container on EC2
         uses: appleboy/ssh-action@v1.0.3
         env:
           ECR_REGISTRY: ${{ needs.build-and-push.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ needs.build-and-push.outputs.image_tag }}
           ECR_PASSWORD: ${{ steps.prep.outputs.ecr_password }}
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -103,20 +100,16 @@ jobs:
           script: |
             set -e
 
-            # Guard: fail fast if registry is missing to avoid Docker Hub fallback
-            if [ -z "$ECR_REGISTRY" ]; then
-              echo "❌ ECR_REGISTRY is empty — aborting to prevent Docker Hub auth error."
-              exit 1
-            fi
-
             FULL_IMAGE="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
-            echo "▶ Deploying image: $FULL_IMAGE"
+            echo "▶ Deploying: ${FULL_IMAGE}"
 
-            # 1. Login to ECR and pull image
-            echo "$ECR_PASSWORD" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
-            docker pull "$FULL_IMAGE"
+            # 1. Login to ECR
+            echo "${ECR_PASSWORD}" | docker login --username AWS --password-stdin "${ECR_REGISTRY}"
 
-            # 2. Stop old container and run new image on port 4005
+            # 2. Pull new image
+            docker pull "${FULL_IMAGE}"
+
+            # 3. Replace running container
             docker stop ecommerce-app 2>/dev/null || true
             docker rm   ecommerce-app 2>/dev/null || true
 
@@ -124,9 +117,9 @@ jobs:
               --name ecommerce-app \
               --restart unless-stopped \
               -p 4005:4005 \
-              "$FULL_IMAGE"
+              "${FULL_IMAGE}"
 
-            # 3. Clean dangling images
+            # 4. Clean up dangling images
             docker image prune -f
 
-            echo "✅ Deployment complete: $FULL_IMAGE"
+            echo "✅ Deployment complete: ${FULL_IMAGE}"
