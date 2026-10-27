@@ -18,9 +18,5 @@ ENV HOSTNAME="0.0.0.0"
 COPY --from=builder /app/public            ./public
 COPY --from=builder /app/.next/standalone  ./
 COPY --from=builder /app/.next/static      ./.next/static
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
 EXPOSE 4005
-ENTRYPOINT ["/entrypoint.sh"]
 CMD ["node", "server.js"]

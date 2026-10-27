@@ -64,12 +64,14 @@ jobs:
 
       - name: Prepare Runtime Secrets
         id: prep
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
           ENV_B64=$(printf '%s' "${{ secrets.ENV_FILE }}" | base64 -w 0)
           echo "::add-mask::$ENV_B64"
           echo "env_b64=$ENV_B64" >> "$GITHUB_OUTPUT"
 
-          ECR_PASS=$(aws ecr get-login-password --region ${{ secrets.AWS_REGION }})
+          ECR_PASS=$(aws ecr get-login-password --region "$AWS_REGION")
           echo "::add-mask::$ECR_PASS"
           echo "ecr_password=$ECR_PASS" >> "$GITHUB_OUTPUT"
 
