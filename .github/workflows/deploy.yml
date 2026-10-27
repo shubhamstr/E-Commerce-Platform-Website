@@ -1,0 +1,108 @@
+name: Build & Deploy to AWS ECR + EC2
+
+on:
+  # push:
+  #   branches:
+  #     - main
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  # ──────────────────────────────────────────────────────────
+  # JOB 1 — Build Docker image & push to ECR
+  # No secrets / env vars needed at build time.
+  # ──────────────────────────────────────────────────────────
+  build-and-push:
+    name: Build & Push to ECR
+    runs-on: ubuntu-latest
+
+    outputs:
+      image: ${{ steps.build-push.outputs.image }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag & push image to ECR
+        id: build-push
+        run: |
+          IMAGE_URI="${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}"
+
+          # No --build-arg needed — placeholder is hardcoded in the Dockerfile.
+          # The real env value is injected at container startup by entrypoint.sh.
+          docker build -t "$IMAGE_URI" .
+
+          docker push "$IMAGE_URI"
+
+          # Also tag as 'latest'
+          docker tag  "$IMAGE_URI" "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest"
+          docker push "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest"
+
+          echo "image=$IMAGE_URI" >> "$GITHUB_OUTPUT"
+
+  # ──────────────────────────────────────────────────────────
+  # JOB 2 — SSH into EC2 & run the new image
+  # All secrets are passed here at runtime via -e flags.
+  # ──────────────────────────────────────────────────────────
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            set -e
+
+            AWS_REGION="${{ secrets.AWS_REGION }}"
+            ECR_REGISTRY="${{ secrets.ECR_REGISTRY }}"
+            ECR_REPOSITORY="${{ secrets.ECR_REPOSITORY }}"
+            IMAGE_TAG="${{ github.sha }}"
+            IMAGE_URI="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+            # ── Auth EC2 to ECR ──────────────────────────────
+            aws ecr get-login-password --region "$AWS_REGION" \
+              | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+
+            # ── Pull the new image ───────────────────────────
+            docker pull "$IMAGE_URI"
+
+            # ── Stop & remove old container ──────────────────
+            docker stop ecommerce-app 2>/dev/null || true
+            docker rm   ecommerce-app 2>/dev/null || true
+
+            # ── Run new container — env injected at RUNTIME ──
+            # entrypoint.sh replaces __NEXT_PUBLIC_SERVER_URL__
+            # in the built JS files before the server starts.
+            docker run -d \
+              --name ecommerce-app \
+              --restart unless-stopped \
+              -p 80:3000 \
+              -e NODE_ENV=production \
+              -e NEXT_PUBLIC_SERVER_URL="${{ secrets.NEXT_PUBLIC_SERVER_URL }}" \
+              "$IMAGE_URI"
+
+            # ── Prune old images ─────────────────────────────
+            docker image prune -f
