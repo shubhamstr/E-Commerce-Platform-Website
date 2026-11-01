@@ -78,9 +78,9 @@ The application connects to the backend API.
 
 - The default API base URL is configured in `src/utils/constants.ts`:
   ```typescript
-  export const SERVER_URL = "http://localhost:5000";
+  export const SERVER_URL = "http://localhost:4005";
   ```
-- Ensure that your local backend server is running at `http://localhost:5000` (or update this constant to point to your deployment).
+- Ensure that your local backend server is running at `http://localhost:4005` (or update this constant to point to your deployment).
 
 ### 4. Running the Development Server
 
