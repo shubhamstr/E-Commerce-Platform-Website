@@ -19,6 +19,7 @@ import { RootState } from "../../store"
 import { updateQuantityState, removeFromCartState } from "../../store/slices/cartSlice"
 import { updateCartQuantity, removeFromCart } from "../../services/cartService"
 import { SERVER_URL } from "../../utils/constants"
+import { getImageUrl } from "../../utils/image"
 import { showSuccess, showError } from "../../utils/toast"
 import { formatPrice } from "../../utils/currency"
 
@@ -100,22 +101,27 @@ const CartList = () => {
               </thead>
               <tbody>
                 {cartItems.map((obj: any, index: any) => {
-                  const imageUrl = obj.product?.imageUrl
-                    ? (obj.product.imageUrl.startsWith("http")
-                        ? obj.product.imageUrl
-                        : `${SERVER_URL}${obj.product.imageUrl}`)
-                    : "/model_1.png"
+                  const imageUrl = getImageUrl(obj.product?.imageUrl, "/model_1.png")
+
 
                   return (
                     <tr key={index}>
                       <td>
                         <Image
-                          alt="Sample"
+                          alt={obj.product?.name || "Product"}
                           src={imageUrl}
+                          unoptimized
                           width={200}
                           height={150}
                           style={{ objectFit: "contain" }}
                           className={styles.bgColor}
+                          onError={(e) => {
+                            const target = e.currentTarget as HTMLImageElement
+                            if (!target.src.endsWith("/model_1.png")) {
+                              target.srcset = ""
+                              target.src = "/model_1.png"
+                            }
+                          }}
                         />
                       </td>
                       <td>{obj.product?.name || "Unknown Product"}</td>

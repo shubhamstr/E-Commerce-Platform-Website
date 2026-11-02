@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import styles from "./collection.module.css"
 import { getAllCategories } from "../../services/categoryService"
 import { SERVER_URL } from "../../utils/constants"
+import { getImageUrl } from "../../utils/image"
 
 const Collections = () => {
   const router = useRouter()
@@ -52,9 +53,10 @@ const Collections = () => {
       ) : (
         <Row xs="1" sm="2" md="4" className="pb-5 g-4">
           {categories.map((category) => {
-            const imageUrl = category.imageUrl
-              ? `${SERVER_URL}${category.imageUrl}`
-              : "/model_4.png"
+            const imageUrl = getImageUrl(category.imageUrl, "/model_4.png")
+
+
+
             return (
               <Col key={category.id}>
                 <div

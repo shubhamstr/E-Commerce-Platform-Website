@@ -5,6 +5,7 @@ import { Col, Container, Row, Spinner } from "reactstrap"
 import { useRouter } from "next/navigation"
 import { getAllCategories } from "../../services/categoryService"
 import { SERVER_URL } from "../../utils/constants"
+import { getImageUrl } from "../../utils/image"
 import styles from "./popularCategories.module.css"
 
 const PopularCategories = () => {
@@ -51,9 +52,8 @@ const PopularCategories = () => {
         ) : (
           <div className={styles.scrollTrack}>
             {categories.map((category) => {
-              const imageUrl = category.imageUrl
-                ? `${SERVER_URL}${category.imageUrl}`
-                : "/model_4.png"
+              const imageUrl = getImageUrl(category.imageUrl, "/model_4.png")
+
               return (
                 <div
                   key={category.id}
