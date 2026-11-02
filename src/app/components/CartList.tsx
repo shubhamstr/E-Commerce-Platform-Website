@@ -11,7 +11,7 @@ import {
   Table,
 } from "reactstrap"
 import styles from "./cart.module.css"
-import Image from "next/image"
+import ProductImage from "./ProductImage"
 import DeleteIcon from "@mui/icons-material/Delete"
 import { useSelector, useDispatch } from "react-redux"
 import { useRouter } from "next/navigation"
@@ -19,7 +19,7 @@ import { RootState } from "../../store"
 import { updateQuantityState, removeFromCartState } from "../../store/slices/cartSlice"
 import { updateCartQuantity, removeFromCart } from "../../services/cartService"
 import { SERVER_URL } from "../../utils/constants"
-import { getImageUrl } from "../../utils/image"
+
 import { showSuccess, showError } from "../../utils/toast"
 import { formatPrice } from "../../utils/currency"
 
@@ -101,27 +101,19 @@ const CartList = () => {
               </thead>
               <tbody>
                 {cartItems.map((obj: any, index: any) => {
-                  const imageUrl = getImageUrl(obj.product?.imageUrl, "/model_1.png")
+
 
 
                   return (
                     <tr key={index}>
                       <td>
-                        <Image
+                        <ProductImage
                           alt={obj.product?.name || "Product"}
-                          src={imageUrl}
-                          unoptimized
+                          src={obj.product?.imageUrl}
                           width={200}
                           height={150}
                           style={{ objectFit: "contain" }}
                           className={styles.bgColor}
-                          onError={(e) => {
-                            const target = e.currentTarget as HTMLImageElement
-                            if (!target.src.endsWith("/model_1.png")) {
-                              target.srcset = ""
-                              target.src = "/model_1.png"
-                            }
-                          }}
                         />
                       </td>
                       <td>{obj.product?.name || "Unknown Product"}</td>

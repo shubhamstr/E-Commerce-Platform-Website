@@ -25,9 +25,9 @@ import { clearCartState } from "../../store/slices/cartSlice"
 import { showSuccess, showError } from "../../utils/toast"
 import { formatPrice, CURRENCY_SYMBOL } from "../../utils/currency"
 import { SERVER_URL } from "../../utils/constants"
-import { getImageUrl } from "../../utils/image"
+
 import BreadcrumbCompo from "../components/BreadcrumbCompo"
-import Image from "next/image"
+import ProductImage from "../components/ProductImage"
 
 const CheckoutPage = () => {
   const router = useRouter()
@@ -494,25 +494,17 @@ const CheckoutPage = () => {
                   </CardTitle>
                   <div className="py-2" style={{ maxHeight: "300px", overflowY: "auto" }}>
                     {cartItems.map((item: any, idx: number) => {
-                      const imageUrl = getImageUrl(item.product?.imageUrl, "/model_1.png")
+
 
                       return (
                         <div key={idx} className="d-flex align-items-center gap-3 mb-3 border-bottom pb-3">
-                          <Image
-                            src={imageUrl}
-                            unoptimized
+                          <ProductImage
+                            src={item.product?.imageUrl}
                             alt={item.product?.name || "Product"}
                             width={60}
                             height={60}
                             style={{ objectFit: "contain", background: "#f8f9fa" }}
                             className="rounded"
-                            onError={(e) => {
-                              const target = e.currentTarget as HTMLImageElement
-                              if (!target.src.endsWith("/model_1.png")) {
-                                target.srcset = ""
-                                target.src = "/model_1.png"
-                              }
-                            }}
                           />
                           <div className="flex-grow-1">
                             <h6 className="m-0 text-truncate" style={{ maxWidth: "180px" }}>

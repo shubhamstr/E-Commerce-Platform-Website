@@ -2,10 +2,10 @@
 "use client"
 import React, { useState, useRef, useEffect } from "react"
 import { Card, CardBody, CardTitle, CardSubtitle, Button } from "reactstrap"
-import Image from "next/image"
+import ProductImage from "./ProductImage"
 import styles from "./product.module.css"
 import { SERVER_URL } from "../../utils/constants"
-import { getImageUrl } from "../../utils/image"
+
 import { useSelector, useDispatch } from "react-redux"
 import { RootState } from "../../store"
 import { addToWishlist, removeFromWishlist } from "../../store/slices/wishlistSlice"
@@ -36,7 +36,7 @@ const ProductCard = ({ index, product, screen }: any) => {
   
   const isWishlisted = wishlistItems.some((item: any) => item.productId === product.id)
 
-  const imageUrl = getImageUrl(product.imageUrl || product.image, "/model_1.png")
+
 
 
 
@@ -203,21 +203,15 @@ const ProductCard = ({ index, product, screen }: any) => {
           )}
         </button>
       )}
-      <Image
+      <ProductImage
         alt={product.name || product.title || "Product"}
-        src={imageUrl}
-        unoptimized
+        src={product.imageUrl || product.image}
+
         width={screen === "shop" ? 382 : 287}
         height={150}
         style={{ objectFit: "contain" }}
         className={styles.bgColor}
-        onError={(e) => {
-          const target = e.currentTarget as HTMLImageElement
-          if (!target.src.endsWith("/model_1.png")) {
-            target.srcset = ""
-            target.src = "/model_1.png"
-          }
-        }}
+
       />
       <CardBody>
         <CardTitle tag="h5">{product.name || product.title}</CardTitle>
